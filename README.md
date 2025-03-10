@@ -1735,7 +1735,7 @@ La question qui tue, pourquoi x 1024 et pas x 1000 ?
 
 ## Base 16
 
-Appelé plus souvent hexadécimal ou hexa, il est définit par 16 symboles différents, de 0 à 9 et de A à F. Représenter des 0 1 est très vite fastidieux, commençons par cela :
+Appelé plus souvent hexadécimal ou hexa, il est défini par 16 symboles différents, de 0 à 9 et de A à F. Représenter des 0 1 est très vite fastidieux, commençons par cela :
 
 | **je compte en binaire sur 8 bits ou 1 octet** | **je compte en hexadécimal** |
 |----|----|
@@ -1919,6 +1919,7 @@ Un "full node" possède l'historique de la totalité des UTXO dans son stockage 
 
 
 * [BTC TouchPoint](https://btctouchpoint.com) - le parcours en vidéos et podcasts de la chute dans le Bitcoin Rabbit Hole
+* [DSN Bitcoin monitoring](https://www.dsn.kastel.kit.edu/bitcoin/) - les vidéos de propagation des blocs à diverses époques !!!
 
 # Littérature
 
@@ -1945,7 +1946,7 @@ Nous avons proposé un système de transactions électroniques qui ne repose pas
 
 (²)  Le minage CPU via `bitcoind` n'est plus supporté depuis `bitcoin core 0.13.0` sorti en 2016.
 
-(³) Pour des raisons de scalabilité cette délégation s'effectue majoritairement par Stratum, un protocole de communication qui sert d'intermédiaire entre les pools d'ASIC spécialisés SHA256 et le nœud Bitcoin mais pas que, puisque *c'est dans ce logiciel serveur de pool que la création des blocs est réalisée*. Stratum permet d'agréger la puissance de calcul du minage en pool avec optimisation de la charge et de la latence réseau. En simplifiant : Stratum crée les nouveaux blocs en coordonnant les pools de mineurs; si un bloc conforme est construit il est transmis au nœud qui va le diffuser ensuite à tous ses pairs.
+(³) Pour des raisons de scalabilité cette délégation s'effectue majoritairement par Stratum, un protocole de communication qui sert d'intermédiaire entre les pools d'ASIC spécialisés SHA256 et le nœud Bitcoin, il permet d'agréger la puissance de calcul du minage en pool avec optimisation de la charge et de la latence réseau. Mais pas que puisque c'est au niveau de Stratum que le bloc est crée. En simplifiant : le mineur ne fait qu'apporter sa puissance de calcul à Stratum qui va coordonner les pools de mineurs. Si un bloc est trouvé, Stratum le transmet au nœud qui va le diffuser ensuite à tous ses pairs.
 
 Au chapitre 4 de son papier, Satoshi Nakamoto avait intelligemment prévu et anticipé que la puissance de calcul du matériel augmenterait dans le temps et dès le départ il a conçu Bitcoin avec une difficulté ajustable pour s'adapter à cette augmentation de puissance de calcul et à l'intérêt variable des nœuds qui minent les nouveaux blocs.
 
@@ -1957,10 +1958,11 @@ Au chapitre 4 de son papier, Satoshi Nakamoto avait intelligemment prévu et ant
 * assurent la collecte et la diffusion des nouvelles transactions
 * valident ou invalident les transactions ou les blocs qui leur sont proposés
 * font respecter les règles du consensus
+* utilisent bien souvent une couche d'anonymisation réseau
 
-**Les pools de minage**, les industriels créant des nouveaux blocs
+**Les pools de minage**, les industriels créant des nouveaux blocs, ils
 
-* sont également des nœuds avec tout ce qui les caractérise
+* mettent en oeuvre des nœuds (supposés sans couche d'anonymisation pour raison de latence réseau)
 * sélectionnent les transactions en attente et les ajoutent au bloc
 * créent et proposent les nouveaux blocs en résolvant l'algorithme de preuve de travail
 * sont à l'initiative du consensus
