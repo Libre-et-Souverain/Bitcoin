@@ -1168,7 +1168,7 @@ J'ai obtenu cela en téléchargeant les sources de Bitcoin Knots et en effectuan
 
 [Tableau d'utilisation des "Pay to"](https://unchained.com/blog/bitcoin-address-types-compared/?utm_campaign=btcmag-launch) depuis l'origine de Bitcoin
 
-| **Type** | **1 ère vue** | **BTC Supply ¹** | **Utilisation ¹** | Appellation courante | **Encodage** | **Préfixe addr** |
+| **Type** | **1 ère vue** | **En % de l'offre BTC ¹** | **Utilisation ¹** | Appellation courante | **Encodage** | **Préfixe addr** |
 |----|----|----|----|----|----|----|
 | P2PK | Jan 2009 | 9% (1.7M) | Obsolète | aucune c'est P2PK | Base16 | 1 |
 | P2PKH | Jan 2009 | 43% (8.3M) | Diminue | Legacy | Base58 | 1 |
@@ -1177,7 +1177,7 @@ J'ai obtenu cela en téléchargeant les sources de Bitcoin Knots et en effectuan
 | P2WSH | Aug 2017 | 4% (0.8M) | Augmente | Segwit ² (P2WSH) | Bech32 | bc1q |
 | P2TR | Nov 2021 | 0.1% (0.02M) | Augmente | Taproot | Bech32m | bc1p |
 
-¹ valable pour l'année 2024, ces données sont sujettes au changement.
+¹ valable pour l'année 2024, ces données sont sujettes au changement
 
 ² Segwit employé tout seul veut dire ici Native Segwit
 
@@ -1204,16 +1204,30 @@ Cela a constitué une solution de transition permettant de bénéficier des amé
 
 ### Segwit
 
-a été activé au bloc 481 824 le 24 août 2017, **c'est le premier soft fork du protocole Bitcoin**. SegWit est la contraction de Segregated Witness. Dans les faits cela sépare (segregate) les données de signature (witness data) des données de transaction principales. Il a été proposé en 2015 par Pieter Wuille pour améliorer la capacité transactionnelle du réseau et corriger la malléabilité des transactions.
+a été activé au bloc 481 824 le 24 août 2017, **c'est le premier soft fork du protocole Bitcoin**. SegWit est la contraction de Segregated Witness. Dans les faits cela sépare (segregate) les données de signature (witness data) des données de transaction principale. Par une BIP, il a été proposé le 21 décembre 2015 pour améliorer la capacité transactionnelle du réseau et corriger la malléabilité des transactions.
 
-* La malléabilité des transactions est un problème où les identifiants de transaction (TXID) peuvent être modifiés par un attaquant avant que la transaction ne soit confirmée. Cela peut entraîner des complications, notamment dans les transactions à signatures multiples. La correction de la malléabilité a également facilité l'implémentation des canaux de paiement qui forment la base du réseau Lightning.
-* En ce qui concerne la capacité transactionnelle, Segwit a introduit la nouvelle métrique WU (Weight Unit ou Unité de Poids) pour quantifier virtuellement la taille des transactions dans le bloc.
-  * Segwit fixe la limite à 4 MWU (Mega Weight Unit = 1 million de WU) par bloc avec `WU = 4 x taille transaction hors witness + taille du witness`
-  * Un bloc de transactions uniquement Legacy occuperait environ 1Mo puisque `4x1Mo + 0 ≃ 4MWU`
-  * Un bloc de transactions uniquement Segwit augmenterait la taille réelle du bloc d'un facteur inférieur à 4. Certains calculs théoriques indiquent que la taille absolue qu'un bloc peut atteindre est quelque chose comme 3,7 Mo. 
-  * En réalité la taille des blocs est variable en [fonction de l'activité et de l'usage](https://www.blockchain.com/fr/explorer/charts/blocks-size), la moyenne constatée en début d'année 2025 se situe à 1,85Mo par bloc avec un MWU proche de 4.
-  * Avant Segwit la taille des transactions était réellement mesurée en octet et limitée depuis l'origine de Bitcoin à 1Mo, Segwit a levé cette barrière. 
-* Segwit permet également une réduction conséquente des frais de transaction. Avant Segwit les frais étaient mesurés en fonction de la taille en octets de la transaction, avec Segwit c'est en fonction du WU. Vu que le bloc est limité à 4MWU, les mineurs sont incités à inclure les transactions possédant un bon ratio entre ses frais et son poids en WU.
+* Correction de la malléabilité des transactions : précédemment à Segwit un attaquant était en mesure de changer les identifiants de transaction (TXID) avant que la transaction ne soit confirmée. Cela pouvait entraîner des complications, notamment dans les transactions à signatures multiples. Cette correction a également facilité l'implémentation des canaux de paiement qui forment la base du réseau Lightning.
+* En séparant les données de transaction des signatures et en introduisant une nouvelle métrique, Segwit a amélioré la capacité transactionnelle du réseau Bitcoin. Cette métrique est nommée WU (Weight Unit ou Unité de Poids), elle quantifie virtuellement la taille des transactions dans le bloc comme ceci :
+  * la limite est fixée à 4 MWU (Mega Weight Unit = 1 million de WU) par bloc avec
+    * `WU = 4 x taille transaction hors witness + taille du witness`(¹)
+  * Un bloc de transactions unique Legacy occuperait environ 1Mo puisque
+    * `4 x 1Mo + 0 = approximativement 4MWU`
+  * Un bloc de transactions uniquement Segwit augmenterait la taille réelle du bloc d'un facteur inférieur à 4. Certains calculs théoriques indiquent que dans ces conditions la taille absolue qu'un bloc peut atteindre est quelque chose comme 3,7 Mo. 
+  * En réalité la [taille des blocs](https://www.blockchain.com/fr/explorer/charts/blocks-size) est variable en fonction des types de transactions inclues dans celui-ci, de l'activité et de l'usage du réseau, la moyenne constatée en début d'année 2025 se situe à 1,85Mo par bloc avec un MWU proche de 4.
+  * Avant Segwit la taille des transactions était réellement mesurée en octet et limitée depuis l'origine de Bitcoin à 1Mo, à sa façon Segwit a donc levé cette barrière.
+* Segwit permet également une réduction conséquente des frais de transaction évalués en `sat/vB` (1 satoshi = 0,00000001 BTC / vB = virtual byte ou octet virtuel. La définition du vB est WU de la transaction divisé par 4, cela permet de comparer les transactions Legacy et SegWit sur une base commune.  Avant Segwit les frais étaient mesurés en fonction de la taille en octets de la transaction, avec Segwit c'est en fonction du WU / 4  soit `vB = taille transaction hors witness + taille du witness ÷ 4`. Donc au point de vue des frais Segwit est avantagé par rapport à Legacy, de plus vu que le bloc est limité à 4MWU, les mineurs sont incités à inclure les transactions possédant un bon ratio entre ses frais et son poids en WU.
+
+(¹) Pour éviter toute confusion entre x3 et x4 due à la définition officielle [BIP141](https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki) où WU est présenté ainsi : `WU = taille TX hors witness x 3 + (taille TX hors witness + taille du witness)` **est identique à** `WU = 4 x taille TX hors witness + taille du witness` 
+
+Informations complémentaires :
+
+* les tailles sont évaluées en octets, donc :
+  * Chaque octet de la partie non-témoin d'une transaction compte pour 1 octet virtuel.
+  * Chaque octet de la partie témoin d'une transaction compte pour 1/4 d'un octet virtuel.
+* Le poids d'un bloc est simplement la somme des poids de toutes les transactions qu'il contient, il n'y a donc qu'une seule et même formule WU pour les transactions et les blocs.
+* Les données hors witness incluent : version, nombre d'entrées, entrées elles-mêmes (sans scripts témoins), nombre de sorties, sorties, locktime.
+* Les données witness incluent : signatures et scripts de déverrouillage.
+
 
 ### **Taproot**
 
