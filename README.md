@@ -182,7 +182,7 @@ Ci dessous je choisi la  v28.0 sans les options de test de débogage et de perfo
 cd ~/code/bitcoin
 git checkout tags/v28.0
 ./autogen.sh
-./configure --disable-tests --disable-fuzz-binary --disable-bench
+./configure --disable-tests --disable-fuzz-binary --disable-bench --disable-usdt
 ```
 
 Relancer `.configure` tant que vous n'obtenez pas ce que vous désirez, pour de l'aide faites `./configure --help` ou `./configure --help | grep -A1 "je cherche ce terme"`
@@ -214,7 +214,7 @@ Options used to compile and link:
 
 Si vous avez paramétré une option mais qu'à l'arrivée elle est absente, regardez si vous n'avez pas une dépendance manquante. Des logs sont générés par `configure`, pour vérifier si une option activée au départ n'est pas ensuite dé-activée effectuer : `grep -i <option_particuliere> config.log` comme par exemple `grep -i bench config.log`
 
-`gui` signifie Graphical User Interface et `qt` est un framework de développement multi-plateforme pour la création d'applications et d'interfaces utilisateur graphiques avec C++
+`gui` signifie Graphical User Interface et `qt` est un framework de développement multi-plateforme pour la création d'applications et d'interfaces utilisateur graphiques avec C++.
 
 `zmq` ZeroMQ est une interface de notification qui permet à des applications externes de recevoir des mises à jour en temps réel sur les événements du réseau Bitcoin. Zéro c'est pour 0 intermédiaire, 0 latence, 0 coût, 0 administration. Cool zéro admin :) MQ c'est pour "Message Queue" ou file de messages. Ce sera peut être utile par la suite, vérifiez que ce soit yes. 
 
@@ -835,7 +835,7 @@ En fonction de vos choix, modifiez la ligne `rpcauth` de `bitcoin.conf`, redéma
 
 ## La construction
 
-Le serveur et le portefeuille Electrum sont apparus en 2011, ils ont été des précurseurs dans le domaine. A l'heure actuelle il existe plusieurs variantes du serveur Electrum, j'ai choisi celle qui me semble la meilleure, à savoir Electrum Rust Server (en condensé `electrs`), l'installation s'effectue sur le nœud par :
+Le serveur et le portefeuille Electrum sont apparus en 2011, ils ont été des précurseurs dans le domaine. A l'heure actuelle il existe plusieurs variantes du serveur Electrum, j'ai choisi celle qui me semble la meilleure et la plus efficiente en terme de ressources, à savoir Electrum Rust Server (en condensé `electrs`), l'installation s'effectue sur le nœud par :
 
 ```bash
 sudo apt-get update
@@ -1420,7 +1420,7 @@ Cette séparation des rôles est fondamentale pour la sécurité : même si votr
 
 ## 10mn : 1 bloc
 
-La blockchain augmente immuablement de 144 blocs par jour et de 52596 en moyenne par an, [la taille des blocs est variable et fonction de l'activité, de l'usage](https://www.blockchain.com/fr/explorer/charts/blocks-size). Si je prends 2 Mo par bloc cela donne 103 Go de + par an. Mon NVMe.M2 de 2 To sera approximativement blindé en 2036. Les capacités et les vitesses de transfert des stockages de masse n'aurons de cesse de s'améliorer dans le futur, il est envisageable que le code de Bitcoin s'adaptera à nouveau.
+La blockchain augmente immuablement de 144 blocs par jour et de 52596 en moyenne par an, la [taille des blocs](https://www.blockchain.com/fr/explorer/charts/blocks-size) est variable et fonction des types de transactions inclues dans celui-ci, de l'activité et de l'usage du réseau. Si je prends 2 Mo par bloc cela donne 103 Go de + par an. Mon NVMe.M2 de 2 To sera approximativement blindé en 2036. Les capacités et les vitesses de transfert des stockages de masse n'aurons de cesse de s'améliorer dans le futur, il est envisageable que le code de Bitcoin s'adaptera à nouveau.
 
 ## Copie directe de la blockchain
 
@@ -1454,7 +1454,7 @@ Plus d'information sur les fichiers et répertoires du nœud Bitcoin : [toute la
 
 ## Nœud public / privé
 
-Un nœud est opérationnel seulement s'il est à jour, si l'on souhaite effectuer des tests tous azimuts, un nœud privé peut s'avérer utile. En effet cela permet d'isoler le nœud de test des autres, il ne divulguera pas d'informations à ses pairs, vous pourrez le redémarrer à volonté et effectuer des choses sensibles en toute discrétion. C'est très bien pour apprendre.
+Un nœud est opérationnel seulement s'il est à jour, si l'on souhaite effectuer des tests tout azimut, un nœud privé peut s'avérer utile. En effet cela permet d'isoler le nœud de test des autres, il ne divulguera pas d'informations à ses pairs, vous pourrez le redémarrer à volonté et effectuer des choses sensibles en toute discrétion. C'est très bien pour apprendre.
 
 * le public est connecté avec ses pairs à travers une couche d'anonymisation (Tor / I2P ) , il fonctionne 7j / 7 en continu. ipv4 n'est utilisé que sur le réseau local pour mettre à jour le nœud privé.
 * le privé fonctionne sur une machine distincte reliée au nœud public par réseau local, c'est le seul pair avec qui il dialogue. En résumé, il ne fait que mettre à jour sa copie de la blockchain afin de rester opérationnel.
@@ -1468,7 +1468,7 @@ Configuration du nœud public **par ajout de  ceci à la fin** de `bitcoin.conf`
 #
 # Le noeud est deja parametre pour echanger avec ses pairs par TOR ou I2P EXCLUSIVEMENT
 # Correspond a tous les parametres actifs de "Confidentialite avancee" 
-# Il permet la mise a jour du ou des autres noeuds connectes au reseau local IPV4
+# Il permet la mise a jour du ou d'autres noeuds connectes au reseau local IPV4
 
 # Remplacez X par la valeur que vous utilisez sur votre LAN
 # Exemple : 192.168.0.0/24 autorise 256 adresses de (192.168.0.0 à 192.168.0.255)
@@ -1972,16 +1972,17 @@ Au chapitre 4 de son papier, Satoshi Nakamoto avait intelligemment prévu et ant
 * assurent la collecte et la diffusion des nouvelles transactions
 * valident ou invalident les transactions ou les blocs qui leur sont proposés
 * font respecter les règles du consensus
-* utilisent bien souvent une couche d'anonymisation réseau
+* sont reliés à leurs pairs le plus souvent par une couche d'anonymisation réseau
 
 **Les pools de minage**, les industriels créant des nouveaux blocs, ils
 
-* mettent en oeuvre des nœuds (supposés sans couche d'anonymisation pour raison de latence réseau)
+* mettent en oeuvre des nœuds optimisés (matériel et configuration) pour le minage 
 * sélectionnent les transactions en attente et les ajoutent au bloc
 * créent et proposent les nouveaux blocs en résolvant l'algorithme de preuve de travail
 * sont à l'initiative du consensus
 * sont les percepteurs de l'inflation programmée avec la récompense de bloc jusqu'en 2140
 * sont les percepteurs des frais de transaction
+* sont reliés à leurs pairs le plus souvent sans couche d'anonymisation pour raison de latence réseau
 
 En admettant que ce que j'ai écrit est suffisamment vrai et exhaustif, l'on pourrait en déduire que les pools de minage proposent et les nœuds disposent. Cependant la réalité doit être bien plus subtile que cela : les pools proposent sous contrainte des nœuds et les nœuds valident avec des règles que les pools leur soumettent ? Ensuite il y a un critère important, celui de la répartition:
 
