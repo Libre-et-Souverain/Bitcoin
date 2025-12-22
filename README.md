@@ -126,7 +126,6 @@ Le débit indiqué ici est à rapprocher de la première ligne de la performance
 
 * Monitoring : `sudo apt-get install btop`  
 * Descriptif hardware de la machine : `sudo apt-get install fastfetch`, puis si voulez l'info à l'ouverture du shell ajoutez une ligne `fastfetch` à la fin de `.bashrc`
-* ==Outil pour faciliter la vie avec man page : tldr==
 
 # Logiciel Bitcoin
 
@@ -1079,7 +1078,7 @@ En fonction de vos choix, modifiez la ligne `rpcauth` de `bitcoin.conf`, redéma
 
 `File/Preferences puis Server`
 
-* Activer ==Bitcoin Core==
+* Activer Bitcoin Core
 * URL: <ip de votre noeud> / 8332
 * User / Pass: btc-node /  who-are-you-satoshi?
 * Faire `Test Connection`
