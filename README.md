@@ -122,10 +122,10 @@ sysbench memory run
 
 Le débit indiqué ici est à rapprocher de la première ligne de la performance du stockage de masse, les chiffres doivent être approximativement similaires.
 
-## Outils complémentaires à installer éventuellement
+## Outils complémentaires éventuels
 
 * Monitoring : `sudo apt-get install btop`  
-* Descriptif hardware de la machine : `sudo apt-get install fastfetch`, puis si voulez l'info à l'ouverture du shell ajoutez une ligne `fastfetch` à la fin de `.bashrc`
+* Descriptif de la machine : `sudo apt-get install fastfetch`, pour une information à l'ouverture du shell ajoutez `fastfetch` à la fin de `.bashrc`
 
 # Logiciel Bitcoin
 
