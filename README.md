@@ -182,7 +182,7 @@ D'après ce que l'on sait, durant les années 2007 à 2008 une (ou plusieurs) pe
 
 ### Choix du code
 
-**en Octobre 2024** : pour choisir la version de client que vous souhaitez construire, faites `git -C ~/code/bitcoin tag` ou allez voir les [releases sur le repository bitcoin](https://github.com/bitcoin/bitcoin/releases), nous sommes loin de la "Guerre des blocs" de 2015 à 2017, la période est apparemment calme et sereine, donc se limiter à deux options me semble raisonnable, cela a donné pour moi :
+**en Octobre 2024** : pour choisir la version de client que vous souhaitez construire, faites `git -C ~/code/bitcoin tag` ou allez voir les [releases sur le repository Bitcoin](https://github.com/bitcoin/bitcoin/releases), nous sommes loin de la "Guerre des blocs" de 2015 à 2017, la période est apparemment calme et sereine, donc se limiter à deux options me semble raisonnable, cela a donné pour moi :
 
 * 'v28.0' pour la dernière "final" qui intègre des améliorations et des correctifs.
 * 'v27.1' l'avant-dernière "final", contient des correctifs pour l'essentiel.
@@ -425,9 +425,9 @@ UsePAM no
 
 \[Bitcoin\] redémarrer le service ssh par  `sudo service ssh reload`
 
-\[PC\] ouvrir un nouveau terminal pour se connecter à \[bitcoin\] par  `ssh username@IP` 
+\[PC\] ouvrir un nouveau terminal pour se connecter à \[Bitcoin\] par  `ssh username@IP` 
 
-\[PC\] vérifier qu'il est impossible de se connecter à \[bitcoin\]
+\[PC\] vérifier qu'il est impossible de se connecter à \[Bitcoin\]
 
 \[PC\] Déplacer les clés dans `~/.ssh` par :
 
@@ -436,9 +436,9 @@ mv ~/id_rsa.pub ~/.ssh/id_rsa.pub
 mv ~/id_rsa ~/.ssh/id_rsa
 ```
 
-\[PC\] se re-connecter à \[bitcoin\] par `ssh username@IP`, cela doit fonctionner sans mot de passe.
+\[PC\] se re-connecter à \[Bitcoin\] par `ssh username@IP`, cela doit fonctionner sans mot de passe.
 
-En cas d'échec vous avez toujours accès à \[bitcoin\] par l'ouverture de la première session pour remédier au problème ... Si c'est OK, fermer tous les terminaux par 'exit'.
+En cas d'échec vous avez toujours accès à \[Bitcoin\] par l'ouverture de la première session pour remédier au problème ... Si c'est OK, fermer tous les terminaux par 'exit'.
 
 \[PC\] S'il est nécessaire d'effacer un "host" en particulier dans `.ssh/known_hosts`, la commande est : `ssh-keygen -R <hostname>` , `hostname` désigne une IP ou un nom de machine sur le réseau local.
 
@@ -454,7 +454,7 @@ Si le deuxième stockage de masse n'est pas déjà monté au démarrage de la ma
 
 * l'indicateur `dos` reporté par `lsblk` veut dire MBR (Master Boot Record), la taille de la partition sera limitée à 2 To, et c'est 4 partitions maximum, outil `fdisk`.
 * `gpt` c'est GPT (GUID Partition Table), les partitions peuvent excéder 2 To, et il est possible de créer jusqu'à 128 partitions, outil `gdisk` ou `parted`.
-* pour résumé, préférez GPT pour la table des partitions.
+* pour résumer, préférez GPT pour la table des partitions.
 
 Pour la suite **attention /!\\ vérifiez bien ce que vous faites et adaptez en fonction de votre cas /!\\** 
 
@@ -505,7 +505,7 @@ sudo nano /etc/fstab
 
 # Puis rajouter à la fin de fstab ces 2 lignes ci dessous  :
 
-# Stockage de masse dedie a bitcoin
+# Stockage de masse dedie a Bitcoin
 UUID=uuid-device /mnt/nvme   ext4    defaults        0       2
 ```
 
@@ -575,7 +575,7 @@ sudo btrfs filesystem df /mnt/btrfs/bitcoin
 
 **Inconvénients de BTRFS sur Ext4** : consomme des ressources CPU et de la Ram, pas adapté aux disques durs classiques. 
 
-**Avantages de BTRFS sur Ext4** : très bien adapté au stockage de masse hors rotatif comme les ssd et les NVMe. BTRFS intègre une fonctionnalité très puissante, les snapshots : ils sont très rapides et économes en espace car seul les changements sont stockés ce qui est parfait pour des backups avec snapshot read-only ou des tests avec snapshot writable (modifier la copie sans affecter l'original grace au Copy-on-Write). Effectuer un snapshot de toute la blockchain bitcoin peut s'avérer utile lors d'une mise à jour de version de `bitcoind`. Autres avantages : compression transparente, checksums pour détecter les corruptions, subvolumes, optimisé pour ssd / nvme avec maintien des performances et prolongation de la durée de vie. Avec le kernel 6.12 de Debian 13 (Trixie) toutes les options ssd / nvme utiles pour l'usage d'un nœud bitcoin sont activées par défaut sauf `noatime` (Debian monte les Btrfs avec `relatime` par défaut). Pour vérifier ces options, faire `mount | grep btrfs`.\n
+**Avantages de BTRFS sur Ext4** : très bien adapté au stockage de masse hors rotatif comme les ssd et les NVMe. BTRFS intègre une fonctionnalité très puissante, les snapshots : ils sont très rapides et économes en espace car seul les changements sont stockés ce qui est parfait pour des backups avec snapshot read-only ou des tests avec snapshot writable (modifier la copie sans affecter l'original grace au Copy-on-Write). Effectuer un snapshot de toute la blockchain Bitcoin peut s'avérer utile lors d'une mise à jour de version de `bitcoind`. Autres avantages : compression transparente, checksums pour détecter les corruptions, subvolumes, optimisé pour ssd / nvme avec maintien des performances et prolongation de la durée de vie. Avec le kernel 6.12 de Debian 13 (Trixie) toutes les options ssd / nvme utiles pour l'usage d'un nœud Bitcoin sont activées par défaut sauf `noatime` (Debian monte les Btrfs avec `relatime` par défaut). Pour vérifier ces options, faire `mount | grep btrfs`.\n
 
 Redémarrer la machine par `sudo shutdown -r now` et vérifier que le périphérique est bien monté automatiquement. Pour copier des fichiers et faire tout un tas de choses (y compris tout massacrer), depuis une éternité il existe sous Debian un gestionnaire de fichier en mode texte, un clone de Norton Commander, que j'affectionne bien et avec lequel vous pouvez utiliser la souris en mode texte dans un terminal : "Midnight Commander" alias `mc` si cela vous tente c'est `sudo apt-get install mc` .
 
@@ -713,7 +713,7 @@ Lisez attentivement votre fichier `bitcoin.conf`, ensuite si vous souhaitez tél
 
 Si vous tenez à votre confidentialité dès le départ, laissez comme c'est, le téléchargement de la blockchain sera plus long, cela peut prendre jusqu'à une semaine.
 
-## Lancement de bitcoind
+## Lancement de `bitcoind`
 
 Visualisez les logs dans un premier terminal :
 
@@ -946,7 +946,7 @@ sudo nano /etc/systemd/system/bitcoin.service
 ```
 
 ```bash
-# bitcoin service
+# bitcoind service
 # /etc/systemd/system/bitcoin.service
 ##### Adaptez l'utilisateur defini, ici c'est 'btc-node' #####
 #
@@ -1016,9 +1016,9 @@ Donc `bitcoind` intègre un wallet avec lequel vous pouvez interagir, les clés 
 
 Ensuite gardez à l'esprit que votre nœud est constamment connecté à Internet et donc exposé à des risques potentiels. Si le wallet intégré à `bitcoind` est utilisé (directement ou avec la librairie Cormorant), cela peut faire de vous une cible si votre solde est découvert. Pour voir le solde, les clés publiques et si les clés privées sont actives, tapez : `bitcoin-cli getwalletinfo`. Si la sortie indique bien `private_keys_enabled : false`, il sera donc impossible de dépenser à partir de là.
 
-Afin d'élargir le choix des portefeuilles utilisables, il est opportun d'installer un serveur Electrum sur le nœud Bitcoin. Il sera ensuite possible d'utiliser le portefeuille Electrum ou un autre pourvu qu'il soit compatible avec le format SPV d'Electrum. Lorsque la date de naissance du portefeuille est inconnue (date de la 1 ère transaction) toute la blockchain doit être parcourue depuis l'origine. Le format SPV permet d'obtenir le solde bitcoin bien plus rapidement que l'utilisation directe ou indirecte du wallet de Bitcoin et ce même avec `blockfilterindex` activé.
+Afin d'élargir le choix des portefeuilles utilisables, il est opportun d'installer un serveur Electrum sur le nœud Bitcoin. Il sera ensuite possible d'utiliser le portefeuille Electrum ou un autre pourvu qu'il soit compatible avec le format SPV d'Electrum. Lorsque la date de naissance du portefeuille est inconnue (date de la 1 ère transaction) toute la blockchain doit être parcourue depuis l'origine. Le format SPV permet d'obtenir le solde Bitcoin bien plus rapidement que l'utilisation directe ou indirecte du wallet de Bitcoin et ce même avec `blockfilterindex` activé.
 
-Avant de se lancer dans d'autres installations, et que l'un n'empêche pas l'autre, ci-dessous la configuration `bitcoin.conf`  pour une connexion directe portefeuille à Bitcoin par RPC (Remote Procedure Call ou appel de procédure distante).
+Avant de se lancer dans d'autres installations, et que l'un n'empêche pas l'autre, ci-dessous la configuration `bitcoin.conf` pour une connexion directe au portefeuille du nœud Bitcoin par RPC (Remote Procedure Call ou appel de procédure distante).
 
 ## Portefeuille connecté directement à Bitcoin
 
@@ -1394,9 +1394,9 @@ HiddenServiceVersion 3
 HiddenServicePort 50001 127.0.0.1:50001
 ```
 
-* Stopper bitcoind : `sudo systemctl stop bitcoin.service`
+* Stopper `bitcoind` : `sudo systemctl stop bitcoin.service`
 * Re-démarrer Tor : `sudo systemctl restart tor`
-* Relancer bitcoind : `sudo systemctl start bitcoin.service`
+* Relancer `bitcoind` : `sudo systemctl start bitcoin.service`
 * Obtenir l'adresse Tor pour connecter son portefeuille à son nœud :
 
   `sudo cat /var/lib/tor/electrs_hidden_service/hostname`
@@ -1657,7 +1657,7 @@ Cette séparation des rôles est fondamentale pour la sécurité : même si votr
 | **Réinitialisation au paramètres d'usine (effacement de toutes les données utilisateur)** | par Trezor Suite ou sur le dispositif après saisie de 16 PIN erronés ou par saisie d'un PIN dédié (wipe code) à la place du PIN de déverrouillage | Réinitialisation aux paramètres d'usine (⁸) par le Control Center de Ledger Live, sur le dispositif par appui long des 2 boutons (settings) ou après la saisie de 3 PIN erronés. | Réinitialisation aux paramètres d'usine avec BitBoxApp ou après la saisie sur le dispositif de 10 PIN erronés  | Uniquement avec Tangem Crypto Wallet |
 | **Multi-portefeuill**e | Oui (⁹) | Oui (⁹) | Oui (⁹) | Oui (⁹) |
 | **Entreprise - Pays d'origine** | [SatoshiLabs](https://trezor.io) - République tchèque | [Ledger SAS](https://www.ledger.com) - France | **[Shift Crypto](https://bitbox.swiss/) -** Suisse | [Tangem AG](https://tangem.com) -Suisse |
-| **Achat du dispositif** | Fiat ou bitcoin | Fiat | Fiat ou bitcoin | Fiat ou bitcoin |
+| **Achat du dispositif** | Fiat ou Bitcoin | Fiat | Fiat ou Bitcoin | Fiat ou Bitcoin |
 
 (¹) à l'heure actuelle il n'existe pas de "secure element" open source, en principe c'est dans cette puce sécurisée que les clés privés sont stockées.
 
@@ -1696,7 +1696,7 @@ La blockchain augmente immuablement de 144 blocs par jour et de 52596 en moyenne
 
 ## Copie directe de la blockchain
 
-Si vous avez un accès physique à un autre nœud de confiance vous pouvez copier sa blockchain au lieu de la télécharger des pairs. Normalement située dans `/home/bitcoin_user/.bitcoin` , vous devrez copier récursivement les répertoires `blocks` et `chainstate` (`indexes` est facultatif car le nœud les re-construira à partir de ce que vous avez paramétré dans `bitcoin.conf`). Le préalable est bien sûr de stopper `bitcoind` le temps de la sauvegarde (ou utilisez un sapshot si btrfs).
+Si vous avez un accès physique à un autre nœud de confiance vous pouvez copier sa blockchain au lieu de la télécharger des pairs. Normalement située dans `/home/bitcoin_user/.bitcoin` , vous devrez copier récursivement les répertoires `blocks` et `chainstate` (`indexes` est facultatif car le nœud les re-construira à partir de ce que vous avez paramétré dans `bitcoin.conf`). Le préalable est bien sûr de stopper `bitcoind` le temps de la sauvegarde (ou si btrfs sans arrêter le daemon avec un snapshot).
 
 Copier 700 Go de données sur un support externe n'est pas anodin, par un port usb 3.0 j'ai eu deux expériences : une de 5h avec un débit de 38 Mo/s sur je sais plus quoi et une autre de 30 minutes avec un débit de 385 Mo/s sur un bon adaptateur usb 3 pour nvme.e M2.  
 
@@ -1862,7 +1862,7 @@ sudo btrfs filesystem usage /mnt/btrfs/bitcoin
 # Lister les subvolumes et les snapshots
 sudo btrfs subvolume list -t /mnt/btrfs/bitcoin
 
-# Creer un READ-ONLY snapshot de la blockcain bitcoin (subvolume snapshots deja existant)
+# Creer un READ-ONLY snapshot de la blockcain Bitcoin (subvolume snapshots deja existant)
 sudo systemctl stop bitcoin.service   # Stoppez le demon bitoind et attendre l'invite.
 sudo btrfs subvolume snapshot -r /mnt/btrfs/bitcoin /mnt/btrfs/snapshots/bitcoin_2025-12-14_RO
 sudo systemctl start bitcoin.service   # Demarrer le demon bitoind
@@ -1905,7 +1905,7 @@ sudo umount /mnt/btrfs_root    # Demonter
 sudo mount -a                  # Remontez les volumes listes fstab
 ```
 
-## maj de bitcoind
+## maj de `bitcoind`
 
 Ouvrir un terminal afin d'accéder au nœud puis afficher la version actuelle avec la commande `bitcoin-cli -version` . Ensuite consulter la page des releases sur le repository, il est utile de lire les notes de la nouvelle version vers laquelle vous mettez à jour (et celles des versions que vous avez sautées) s'il y a des fonctionnalités / options qui vous intéressent ou que vous allez devoir gérer. Il est ici bon de préciser que l'on va toujours de l'avant, jamais en arrière. Ainsi si vous avez construit votre nœud avec Bitcoin Core v28.0 n'installez pas une v27.x car cela va mal se passer avec les données de blockchain.
 
@@ -1977,7 +1977,7 @@ sudo systemctl stop bitcoin.service
 nano ~/.bitcoin/bitcoin.conf
 # Commenter #daemon=1 dans le fichier de conf, sauvegarder.
 
-# Se positionner dans le répertoire du code source de bitcoin
+# Se positionner dans le répertoire du code source de Bitcoin
 cd ~/code/bitcoin
 
 # Installer la nouvelle version selon le cas :
@@ -2000,7 +2000,7 @@ sudo systemctl disable bitcoin.service
 nano ~/.bitcoin/bitcoin.conf
 
 # Observer les logs dans un terminal
-# Dans un autre terminal, relancer bitcoin avec le service 
+# Dans un autre terminal, relancer bitcoind avec le service 
 sudo systemctl start bitcoin.service
 
 # bitoind est synchronisé avec ses pairs ? Oui alors relancer electrs
@@ -2173,7 +2173,7 @@ Les portefeuilles matériels ou logiciels modernes permettent de générer des c
   * `86` en référence aux adresses Taproot `bc1p`  `P2TR`  [BIP86](https://github.com/bitcoin/bips/blob/master/bip-0086.mediawiki)
   * l'utilisation de l'apostrophe `'` ou du `h` après le paramètre signifie "hardened derivation" ou dérivation renforcée, comme `44h` ou `44'`. Un algorithme supplémentaire est mis en oeuvre, il devient presque impossible d'accéder à la clé maître même si une clé privée dérivée est compromise. Cela constitue une une couche supplémentaire de sécurité.
 * **coin type** → renseigne sur l'actif
-  * `0` est bitcoin (`'`  ou `h` sont utilisables)
+  * `0` est Bitcoin (`'`  ou `h` sont utilisables)
   * pour reste c'est [ici](https://github.com/satoshilabs/slips/blob/master/slip-0044.md).
 * **account** → indique l'identité ou la collection d'adresses, la première est notée `0`. Dans un portefeuille multi-comptes cela permet aux utilisateurs de séparer les fonds pour différentes choses comme hold, dépense, dons, etc… (`'`  ou `h` sont utilisables)
 * **change** → renseigne sur la transaction
@@ -2185,7 +2185,7 @@ Les portefeuilles matériels ou logiciels modernes permettent de générer des c
 Par exemple `m/44h/0h/0h/1/1` indique :
 
 * `44h` adresse Legacy renforcée
-* `0h` le type d'actif est renforcé, ici bitcoin.
+* `0h` le type d'actif est renforcé, ici Bitcoin.
 * `0h` le compte est renforcé, ici le premier, le suivant sera noté `1'`.
 * `1` une adresse de rendu monnaie
 * `1` une adresse de rang 2, le rang 1 (la première adresse) étant notée `0` .
@@ -2217,7 +2217,7 @@ Contrairement à l'adressage IP, on ne peut pas désigner la machine propriétai
 
 ## PSBT
 
-Partially Signed Bitcoin Transactions. Une transaction Bitcoin partiellement signée est un format de données qui permet aux portefeuilles et à d'autres outils d'échanger des informations sur une transaction Bitcoin et les signatures nécessaires pour la finaliser. Une PSBT peut être créée en identifiant un ensemble d'UTXO à dépenser et un ensemble de sorties pour recevoir la valeur dépensée. Des informations sur chaque UTXO nécessaires pour générer une signature peuvent ensuite être ajoutées, éventuellement par un outil distinct, comme le script de l'UTXO ou sa valeur précise en bitcoin. La PSBT peut ensuite être copiée par n'importe quel moyen vers un programme capable de la signer. Pour les portefeuilles à plusieurs signatures ou dans les cas où différents portefeuilles contrôlent différentes entrées, cette dernière étape peut être répétée plusieurs fois par différents programmes sur différentes copies de la PSBT. Plusieurs PSBT comportant chacune une ou plusieurs signatures nécessaires peuvent être intégrées ultérieurement dans une PSBT unique. Enfin, cette PSBT entièrement signée peut être convertie en une transaction complète prête à être diffusée.
+Partially Signed Bitcoin Transactions. Une transaction Bitcoin partiellement signée est un format de données qui permet aux portefeuilles et à d'autres outils d'échanger des informations sur une transaction Bitcoin et les signatures nécessaires pour la finaliser. Une PSBT peut être créée en identifiant un ensemble d'UTXO à dépenser et un ensemble de sorties pour recevoir la valeur dépensée. Des informations sur chaque UTXO nécessaires pour générer une signature peuvent ensuite être ajoutées, éventuellement par un outil distinct, comme le script de l'UTXO ou sa valeur précise en Bitcoin. La PSBT peut ensuite être copiée par n'importe quel moyen vers un programme capable de la signer. Pour les portefeuilles à plusieurs signatures ou dans les cas où différents portefeuilles contrôlent différentes entrées, cette dernière étape peut être répétée plusieurs fois par différents programmes sur différentes copies de la PSBT. Plusieurs PSBT comportant chacune une ou plusieurs signatures nécessaires peuvent être intégrées ultérieurement dans une PSBT unique. Enfin, cette PSBT entièrement signée peut être convertie en une transaction complète prête à être diffusée.
 
 ## Secure element et norme EAL
 
@@ -2291,7 +2291,7 @@ Nous avons proposé un système de transactions électroniques qui ne repose pas
 
 (¹) Nous sommes fin 2008, il est fait référence à un équipement tout en un où le nœud utilise la puissance de traitement de son CPU (²) pour la création des nouveaux blocs avec la preuve de travail. Depuis 2013 \~ 2014 cette preuve de travail (Proof of Work ou POW), *qui est la base du consensus*,  est devenu une activité industrielle nécessitant des investissements colossaux et donc hors de portée de l'individu. Le hashrate, qui quantifie la puissance de traitement SHA256 disponible sur le réseau Bitcoin, s'est externalisé et professionnalisé.  Autrement dit, pour avoir une chance raisonnable de propager de nouveaux blocs avec un nœud Bitcoin, il est nécessaire de déléguer (³) la puissance de calcul à des milliers de puces spécialisées appelées ASIC qui sont groupées dans ce que l'on nomme des pools de minage.
 
-(²)  Le minage CPU via `bitcoind` n'est plus supporté depuis `bitcoin core 0.13.0` sorti en 2016.
+(²)  Le minage CPU via `bitcoind` n'est plus supporté depuis Bitcoin core 0.13.0 sorti en 2016.
 
 (³) Pour des raisons de scalabilité cette délégation s'effectue majoritairement par Stratum, un protocole de communication qui sert d'intermédiaire entre les pools d'ASIC spécialisés SHA256 et le nœud Bitcoin, il permet d'agréger la puissance de calcul du minage en pool avec optimisation de la charge et de la latence réseau. Mais pas que puisque c'est au niveau de Stratum que le bloc est crée. En simplifiant : le mineur ne fait qu'apporter sa puissance de calcul à Stratum qui va coordonner les pools de mineurs. Si un bloc est trouvé, Stratum le transmet au nœud qui va le diffuser ensuite à tous ses pairs.
 
