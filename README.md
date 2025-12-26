@@ -155,7 +155,7 @@ git clone https://github.com/bitcoinknots/bitcoin.git # Pour Bitcoin Knots
 
 ## **Installer les outils et les librairies**
 
-Installer les dépendances nécessaires à la construction de [Bitcoin Core](https://github.com/bitcoin/bitcoin/blob/master/doc/dependencies.md) ou de [Bitcoin Knots](https://github.com/bitcoinknots/bitcoin/)
+Installer les dépendances nécessaires à la construction Bitcoin
 
 ```bash
 sudo apt-get install build-essential libtool autotools-dev automake pkg-config bsdmainutils python3 libevent-dev
@@ -182,12 +182,12 @@ D'après ce que l'on sait, durant les années 2007 à 2008 une (ou plusieurs) pe
 
 ### Choix du code
 
-**Octobre 2024** : pour choisir la version de client que vous souhaitez construire, faites `git -C ~/code/bitcoin tag` ou allez voir les [releases sur le repository bitcoin](https://github.com/bitcoin/bitcoin/releases), nous sommes loin de la "Guerre des blocs" de 2015 à 2017, la période est apparemment calme et sereine, donc se limiter à deux options me semble raisonnable, cela a donné pour moi :
+**en Octobre 2024** : pour choisir la version de client que vous souhaitez construire, faites `git -C ~/code/bitcoin tag` ou allez voir les [releases sur le repository bitcoin](https://github.com/bitcoin/bitcoin/releases), nous sommes loin de la "Guerre des blocs" de 2015 à 2017, la période est apparemment calme et sereine, donc se limiter à deux options me semble raisonnable, cela a donné pour moi :
 
 * 'v28.0' pour la dernière "final" qui intègre des améliorations et des correctifs.
 * 'v27.1' l'avant-dernière "final", contient des correctifs pour l'essentiel.
 
-**Décembre 2025** : l'année 2025 a vu apparaître une crise du spam avec notamment "la guerre des OP_RETURN". OP_RETURN est un opcode ou une instruction dans le langage de script de Bitcoin qui permet d'intégrer des données arbitraires dans une sortie de transaction que l'on ne peut pas dépenser. Cela signifie que ces données sont stockées sur la blockchain sans créer une sortie valide qui pourrait être réclamée plus tard. Historiquement OP_RETURN a été introduit en 2014 dans Bitcoin Core 0.9 pour permettre l'ajout de petites quantités de données comme des preuves de timestamp, des métadonnées ou des hachages pour des applications comme le notaire virtuel, tout en évitant le spam sur le réseau. La limite standard de relais (relay policy) était de 80 octets par OP_RETURN pour empêcher une surcharge de la blockchain avec des données inutiles.  La version Bitcoin Core 30.0 sortie en octobre 2025 lève cette limite de 80 octets, ne laissant plus que la limite de taille des blocs de 4 Mo. Les débats autour d'OP_RETURN portent souvent sur l'équilibre entre nouvelles fonctionnalités (les inscriptions, les tokens, finance décentralisée, etc … ) et la protection contre le spam, qui pourrait gonfler la blockchain et augmenter les coûts pour les utilisateurs ordinaires. A l'opposé de Bitcoin Core v 30.0 il y a [Bitcoin Knots](https://github.com/bitcoinknots/bitcoin) v 29.2 20251110 qui est conçu entre autres pour renforcer la décentralisation et filtrer les transactions considérées comme abusives, par défaut OP_RETURN est limité à 83 octets. 
+**en Décembre 2025** : l'année 2025 a vu apparaître une crise du spam avec OP_RETURN. OP_RETURN est un opcode ou une instruction dans le langage de script de Bitcoin qui permet d'intégrer des données arbitraires dans une sortie de transaction que l'on ne peut pas dépenser. Cela signifie que ces données sont stockées sur la blockchain sans créer une sortie valide qui pourrait être réclamée plus tard. Historiquement OP_RETURN a été introduit en mars 2014 dans Bitcoin Core 0.9 pour permettre l'ajout de petites quantités de données comme des preuves de timestamp, des métadonnées ou des hachages pour des applications comme le notaire virtuel, tout en évitant le spam sur le réseau. La limite standard de relais (relay policy) était de 80 octets par OP_RETURN pour empêcher une surcharge de la blockchain avec des données inutiles.  La version Bitcoin Core 30.0 sortie en octobre 2025 lève cette limite de 80 octets, ne laissant plus que la limite de taille des blocs de 4 Mo. Les débats autour d'OP_RETURN portent souvent sur l'équilibre entre nouvelles fonctionnalités (les inscriptions, les tokens, finance décentralisée, etc … ) et la protection contre le spam, qui pourrait gonfler la blockchain et augmenter les coûts pour les utilisateurs ordinaires. A l'opposé de Bitcoin Core v 30.0 il y a [Bitcoin Knots](https://github.com/bitcoinknots/bitcoin) v 29.2 qui est conçu entre autres pour renforcer la décentralisation et filtrer les transactions considérées comme abusives, par défaut OP_RETURN est limité à 83 octets. 
 
 Il est sain que des frictions existent. La résilience d'un réseau c'est aussi sa diversification : avant ce débat seulement 1 à 2 % des [nœuds du réseau](https://coin.dance/nodes) n'utilisaient pas Bitcoin Core, en décembre 2025 c'est 21.5 % qui tournent avec Bitcoin Knots. Sur [The Bitcoin Portal](https://thebitcoinportal.com/onchain/spam-analysis/overview) figure un dashboard qui distingue les transactions financières des non financières dans le temps. Ceci étant faites vos propres recherches et forgez vous votre propre avis.
 
@@ -195,20 +195,21 @@ Il est sain que des frictions existent. La résilience d'un réseau c'est aussi 
 
 `gui` ou `bitcoin-qt (GUI)` signifie Graphical User Interface et `qt` est un framework de développement multi-plateforme pour la création d'applications et d'interfaces utilisateur graphiques avec C++. Nécessite une interface graphique, à tester c'est sympa, mais off dans ce cas d'usage.
 
-`zmq` ou `ZeroMQ` est une interface de notification qui permet à des applications externes de recevoir des mises à jour en temps réel sur les événements du réseau Bitcoin. Zéro c'est pour 0 intermédiaire, 0 latence, 0 coût, 0 administration. Cool zéro admin :) MQ c'est pour "Message Queue" ou file de messages. Activez, peut être utile par la suite.
+`zmq` ou `ZeroMQ` est une interface de notification qui permet à des applications externes de recevoir des mises à jour en temps réel sur les événements du réseau Bitcoin. Zéro c'est pour 0 intermédiaire, 0 latence, 0 coût, 0 administration. Cool, zéro admin :) MQ c'est pour "Message Queue" ou file de messages. Activez, peut être utile par la suite.
 
 A propos du terme USDT, cela n'a rien à voir avec les "stablecoins", c'est utilisé pour activer les traces utilisateur statiquement définies, ce sont des outils de traçage pour l'analyse des performances et le débogage. C'est très intéressant mais hors du "scope" ici.
 
-Il existe d'autres options de compilation non décrites ici, non utiles pour l'usage visé ici.
+Il existe d'autres options de compilation non décrites ici, non pertinentes pour l'usage visé ici.
 
-### Si version < v29
+### Avant la v29
 
 Ci dessous je choisi la  v28.0 sans les options de test de débogage et de performance :
 
 ```bash
-# Si version choisie < v29, utiliser Autotools
+# Valable si la version construite precede la v29
 cd ~/code/bitcoin
-git checkout tags/v28.0
+git tag                    # liste les versions disponibles
+git checkout tags/v28.0    # ici je choisis la v28 Core
 ./autogen.sh
 ./configure --disable-tests --disable-fuzz-binary --disable-bench --disable-usdt
 ```
@@ -251,17 +252,17 @@ sudo make install   # Installation des binaires, par défaut dans /usr/local/bin
 
 La compilation (la ligne make) dure 1 à 2 heures sur un Raspberry Pi 5 / NVMe.M2 en fonction des options (si tests, fuzz binary et bench sont actives cela rallonge le temps de compilation) et environ 20mn sur le Dell Optiplex 5050. Pendant ce temps vous pouvez ouvrir un nouveau terminal et installer Tor, I2P,  … ou continuer à flâner dans le code source ou la documentation de Bitcoin. N'oubliez pas de taper la deuxième ligne !
 
-### Si version ≥ v29
+### A partir de la v29
 
-A partir de la v29 de Bitcoin, le système de build a migré d'Autotools vers CMake.
+Changement : le système de build  Bitcoin a migré d'Autotools vers CMake.
 
  Si CMake non installé, effectuer `sudo apt-get install cmake`
 
 ```bash
-# Si version choisie > v28
 cd ~/code/bitcoin
-git checkout tags/v29.2.knots20251110
-mkdir build
+git tag                                  # liste les versions disponibles
+git checkout tags/v29.2.knots20251110    # ici je choisis la v29.2 Knots
+mkdir build                              # Creation du repertoire build
 
 cmake -B build -LH # liste complete et à jour des options disponibles avec leurs valeurs par defaut
 cmake -B build -DWITH_ZMQ=ON -DBUILD_TESTS=OFF # Selection des options avant compilation
@@ -1850,9 +1851,9 @@ Si nécessaire redémarrez le système par `sudo reboot`
 
 ## Snapshot des données
 
-Si le périphérique de masse qui héberge les données blockchain est formaté BTRFS un snapshot peut s'avérer utile avant une mise à jour de `bitcoind`. Le snapshot permet de sauvegarder l'état de la blockchain avant chaque mise à jour, d'effectuer un roolback si besoin est, mais également d'être en mesure de le copier sur un autre support de stockage la blockchain entière sans arrêter le daemon `bitcoind` .
+Si les données données blockchain sont hébergées sur un stockage de masse formaté BTRFS, un snapshot peut s'avérer utile avant une mise à jour de `bitcoind`. Un snapshot read-only permet de sauvegarder l'état de la blockchain avant chaque mise à jour et d'effectuer un roolback si nécessaire. Il est possible de faire pas mal de choses avec les snapshots comme copier la blockchain jusqu'à la date du snapshot sur un autre support de stockage sans arrêter le daemon `bitcoind` ; ou encore utiliser la copie blockchain de votre nœud avec un snapshot writable destiné à faire tourner un autre nœud par exemple en mode graphique sur votre PC. (montage dans le filesystem de votre PC avec SSHFS (SSH File System) `sshfs utilisateur@hote_distant:/chemin/distant ~/remote_mount`)
 
- Voici quelques exemples de commandes :
+ Voici quelques commandes et cas d'usages :
 
 ```bash
 # Afficher l'espace libre / utilise
@@ -1862,7 +1863,7 @@ sudo btrfs filesystem usage /mnt/btrfs/bitcoin
 sudo btrfs subvolume list -t /mnt/btrfs/bitcoin
 
 # Creer un READ-ONLY snapshot de la blockcain bitcoin (subvolume snapshots deja existant)
-sudo systemctl stop bitcoin.service   # Stoppez le demon bitoind, attendre l'invite.
+sudo systemctl stop bitcoin.service   # Stoppez le demon bitoind et attendre l'invite.
 sudo btrfs subvolume snapshot -r /mnt/btrfs/bitcoin /mnt/btrfs/snapshots/bitcoin_2025-12-14_RO
 sudo systemctl start bitcoin.service   # Demarrer le demon bitoind
 
@@ -1879,7 +1880,7 @@ sudo btrfs send /mnt/btrfs/snapshots/nom-du_snapshot_date | btrfs receive /mnt/u
 sudo btrfs filesystem usage /mnt/usb
 
 # Effacer un snapshot
-sudo btrfs subvolume delete /mnt/btrfs/snapshots/nom-du-snapshot_date
+sudo btrfs subvolume delete /mnt/btrfs/snapshots/nom-du-snapshot
 ```
 
 A partir d'un snapshot **read-only** revenir à un état précédent (rollback)
@@ -1906,7 +1907,7 @@ sudo mount -a                  # Remontez les volumes listes fstab
 
 ## maj de bitcoind
 
-Ouvrir un terminal afin d'accéder au nœud puis afficher la version actuelle avec la commande `bitcoin-cli -version` . Ensuite consulter la page des [releases sur le repository bitcoin](https://github.com/bitcoin/bitcoin/releases), il est utile de lire les notes de la nouvelle version vers laquelle vous mettez à jour (et celles des versions que vous avez sautées) s'il y a des fonctionnalités / options qui vous intéressent ou que vous allez devoir gérer. Il est ici bon de préciser que l'on va toujours de l'avant, jamais en arrière. Ainsi si vous avez construit votre nœud avec Bitcoin Core v28.0 n'installez pas une v27.x car cela va mal se passer avec les données de blockchain.
+Ouvrir un terminal afin d'accéder au nœud puis afficher la version actuelle avec la commande `bitcoin-cli -version` . Ensuite consulter la page des releases sur le repository, il est utile de lire les notes de la nouvelle version vers laquelle vous mettez à jour (et celles des versions que vous avez sautées) s'il y a des fonctionnalités / options qui vous intéressent ou que vous allez devoir gérer. Il est ici bon de préciser que l'on va toujours de l'avant, jamais en arrière. Ainsi si vous avez construit votre nœud avec Bitcoin Core v28.0 n'installez pas une v27.x car cela va mal se passer avec les données de blockchain.
 
 Si vous lisez la documentation concernant le cycle de vie de Bitcoin Core, vous constaterez qu'il est le suivant :
 
@@ -1924,6 +1925,10 @@ Bon, tout cela est de la belle littérature : en définitive faites ce que bon v
 # Se positionner dans le répertoire du code source de bitcoin
 cd ~/code/bitcoin
 
+# Si vous passez a autre chose que Bitcoin Core ou decidiez d'y revenir
+# renommez le repertoire actuel. Contruire toujours dans le repertoire
+# bitcoin et une bonne maniree d'operer.
+
 # Mettre à jour le code source
 git pull
 
@@ -1931,7 +1936,7 @@ git pull
 git tag
 ```
 
-**Ici pour l'exemple, je choisi la "v29.0"**
+**Ici pour l'exemple, je choisi la "Core v29.0"**
 
 Facultatif : vérifier que la "release" que vous avez sélectionnée est signée :
 
@@ -1946,24 +1951,12 @@ git verify-tag "v29.0"
 Poursuivre avec
 
 ```bash
-git checkout "v29.0"
-make clean
-./autogen.sh
-./configure --disable-tests --disable-fuzz-binary --disable-bench
-# Vérifier que la sortie du .configure soit dans vos attentes
+git checkout tags/v29.0
+make clean # Valable quelle que soit la version (Autotools ou CMake)
 
-# C'est ok ? alors construisez et attendez que cela se passe ...
-make
-
-# OU
-# bien si vous avez autre chose en vue, lancez cette commande en tâche de fond
-make > build-bitcoind.log &
-
-# Vérifiez quand même que cela se construit en visualisant la sortie capturée
-tail -f build-bitcoind.log
-# Ok, je ferme le terminal, j'arrête mon PC desktop et je me barre
-# je rependrais plus tard par cette commande pour voir si tout est correct
-cat ~/code/bitcoin/build-bitcoind.log
+Pour la construction voir compilation initiale plus haut, faire le distinguo version.
+A partir de la v29 ce n'est plus Autotools mais CMake qui est utilise
+Compiler ici ...
 ```
 
 Le nouveau binaire est construit, on continue
@@ -1987,8 +1980,9 @@ nano ~/.bitcoin/bitcoin.conf
 # Se positionner dans le répertoire du code source de bitcoin
 cd ~/code/bitcoin
 
-# Installer la nouvelle version
-sudo make install
+# Installer la nouvelle version selon le cas :
+sudo make install            # Avant la v29
+sudo cmake --install build   # A partir de la v29
 
 # Lancer bitcoind, 
 bitcoind
@@ -2272,7 +2266,7 @@ Un "full node" possède l'historique de la totalité des UTXO dans son stockage 
 
 * [BTC TouchPoint](https://btctouchpoint.com) - le parcours en vidéos et podcasts de la chute dans le Bitcoin Rabbit Hole
 * [DSN Bitcoin monitoring](https://www.dsn.kastel.kit.edu/bitcoin/) - les vidéos de propagation des blocs à diverses époques !!!
-* [BitcoinStrings](https://bitcoinstrings.com/)  /  [Bitaddress.org](https://www.bitaddress.org/)
+* [BitcoinStrings](https://bitcoinstrings.com/)  /  [Bitaddress.org](https://www.bitaddress.org/) / [LearnMeBitcoin](https://learnmeabitcoin.com/)
 
 # Littérature
 
