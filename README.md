@@ -1728,7 +1728,6 @@ Cette séparation des rôles est fondamentale pour la sécurité : même si votr
 
 *Sauf pour Tangem, il est possible de restreindre l'usage des suites logicielles fournies par les fabricants à la vérification, la mise à jour du firmware et à l'installation du micro logiciel. Avec Trezor Safe 3 ou Ledger Nano S Plus vous n'avez pas besoin de créer de compte (création du portefeuille et génération des adresses) dans la suite logicielle. BitBox02 nécessite l'utilisation de BitboxApp pour restaurer ou créer le portefeuille en générant la phrase de récupération, ensuite il est possible d'utiliser le dispositif avec le portefeuille logiciel de votre choix pourvu qu'il soit compatible.*
 
-
 # Annexes
 
 ## 10mn : 1 bloc
@@ -1864,18 +1863,15 @@ pour supprimer le portefeuille "miner_wallet"
 
 Pour aller plus loin vous trouverez sur le net tout ce qu'il faut pour créer un wallet avec clé privée sur votre nœud privé (lui aussi). Vous pouvez générer avec un navigateur en mode hors ligne clés privées et adresses en chargeant à partir de votre disque dur la page "BIP39 tool".
 
-
 ## Seed phrase 12 ou 24 mots
 
 | **Face à** | **Phrase de 12 mots** | **Phrase de 24 mots** |
 |----|----|----|
 | Sécurité face au quantique | Suffisante en l'état actuel des perspectives | Plus sécurisée que 12 mots |
-|    |    |    |
 | Praticité | Moins de mots c'est moins d'erreurs lors d'une restauration, moins d'efforts pour graver sur support métallique. | 2 fois plus longue à graver et à restaurer. |
 | Confidentialité | Discrète à stocker ou partager en cas de besoin, exemple gravure sur métal compacte. | Difficile à brute-forcer si partiellement compromise, 24 mots protègent mieux contre les fuites partielles comme une courte exposition visuelle. |
 | Échappatoire | Mémorisable par un individu | Difficilement mémorisable par un individu |
 | Résistance à un oppresseur | Si forcée à divulgation, une phrase de 12 mots est vulnérable à une reconstruction partielle. | Plus complexe à retenir, potentiellement plus long à la divulgation augmentant le risque de capitulation de l'oppresseur. Reconstruction partielle plus délicate. |
-
 
 # Les mises à jour
 
@@ -2101,7 +2097,7 @@ Observer les logs, tout est correct ? alors fermer les terminaux.
 
 ## maj Appimage sur le Desktop Linux
 
-Si la fonctionnalité de mise à jour est disponible dans l'application elle même, activez là et en principe plus besoin de vérifier l'authenticité. Sinon téléchargez la nouvelle version, vérifiez son authenticité, ajoutez à l'ancienne version `.old` puis installez comme pour la première fois, pour finir mettez à jour le nom dans le lanceur si vous en avez crée un la première fois. Les paramètres utilisateur sont en principe à l'abri puisque séparés dans des répertoires `~/.nom_d-appimage` ou dans `~/.config/nom_d-appimage`
+Avant de mettre à jour, effectuez une copie de sauvegarde de l'Appimage. Si la fonctionnalité de mise à jour est disponible dans l'application elle même, activez là et en principe plus besoin de vérifier l'authenticité. Sinon téléchargez la nouvelle version, vérifiez son authenticité, puis installez comme pour la première fois, pour finir mettez à jour le nom dans le lanceur si vous en avez crée un la première fois. Les paramètres utilisateur sont en principe à l'abri puisque séparés dans des répertoires `~/.nom_d-appimage` ou dans `~/.config/nom_d-appimage`
 
 Exemple avec Trezor-suite :
 
@@ -2215,9 +2211,11 @@ Une BIP (Bitcoin Improvement Proposal) est une proposition d'amélioration de Bi
 
 ## BIP39
 
-Du fait que le cerveau humain n'est pas à l'aise face à ceci : `f0c594301c50e67b02dc14b34e69b7d070a2d524878528f4a3777d0a266291a70f3bdad261c571ef93997e3eb9d38ab6aeca814a3533575b1575ad10f404e05c` , des individus se sont penchés sur le problème et le standard BIP39 a émergé. Cela donne en version 12 mots : `party duck tribe color model help bulk ghost vehicle loud sketch visual` 
+Le cerveau humain n'étant pas à l'aise face à des clés cryptographiques des individus se sont penchés sur le problème. Cela a donné BIP 39 qui définit une méthode pour passer de 12, 15, 18, 21 ou 24 mots extraits d'une liste prédéfinie de 2048 mots anglais (¹) à une graine cryptographique unique. Cette fonction est à sens unique, il n'est pas possible de retrouver les mots d'après la graine. Si je génère aléatoirement avec 12 mots j'obtiens `party duck tribe color model help bulk ghost vehicle loud sketch visual` , la graine BIP39 correspondante est :
 
-Ce standard définit une méthode pour passer de 12, 15, 18, 21 ou 24 mots extraits d'une liste prédéfinie de 2048 mots à une graine cryptographique unique BIP39. La fonction est à sens unique, donc impossible de retrouver les mots d'après la graine.
+`f0c594301c50e67b02dc14b34e69b7d070a2d524878528f4a3777d0a266291a70f3bdad261c571ef93997e3eb9d38ab6aeca814a3533575b1575ad10f404e05c` 
+
+(¹) cette liste de 2048 mots existe dans d'autres langues mais leur utilisation est déconseillée pour éviter des problèmes d'incompatibilités.
 
 ## BIP32 / BIP44
 
@@ -2268,13 +2266,13 @@ Par exemple `m/44h/0h/0h/1/1` indique :
 
 ## Compact block relay
 
-Quand un mineur trouve un nouveau bloc, il doit être propagé le plus vite possible à tout le réseau. Un bloc peut faire 1 à 4 Mo, mais la majorité des transactions qu'il contient sont déjà connues des nœuds car elles sont dans leur mempool. Compact block relay (BIP 152, déployé avec Bitcoin Core 0.13.0 en 2016) exploite cet état de fait, donc au lieu d'envoyer le bloc complet il envoie un résumé compact contenant :
+Quand un mineur trouve un nouveau bloc, il doit être propagé le plus vite possible à tout le réseau. Celui-ci peut faire 1 à 4 Mo, mais la majorité des transactions qu'il contient sont déjà connues des nœuds car elles sont dans leur mempool. Compact block relay (BIP 152, déployé avec Bitcoin Core 0.13.0 en 2016) exploite cet état de fait, donc au lieu d'envoyer le bloc complet il envoie un résumé compact contenant :
 
 * le header du bloc
 * les identifiants raccourcis (6 octets) de chaque transaction
 * les transactions que l'émetteur pense inconnues du pair (typiquement la coinbase)
 
-Le nœud récepteur reconstitue le bloc à partir de son propre mempool. S'il lui manque une transaction, il la demande individuellement. Le gain est considérable, la transmission n'est que de quelques Ko au lieu de plusieurs Mo. 
+Le nœud récepteur reconstitue le bloc à partir de son propre mempool. S'il lui manque une transaction, il la demande individuellement. Le gain est considérable, la transmission n'est que de quelques Ko.
 
 Au chapitre "Détail des connexions réseau" avec la commande `bitcoin-cli -netinfo 4` la colonne `hb` indique le statut "high bandwidth compact block relay", en voici une explication détaillé :
 
@@ -2284,7 +2282,7 @@ Au chapitre "Détail des connexions réseau" avec la commande `bitcoin-cli -neti
   * Le bloc compact est envoyé
 
 
-* High bandwidth (ce mode est signalé par un hb `.` ou `*`)
+* High bandwidth (ce mode est signalé par un `hb` = `.` ou `*`)
   * Le nœud envoie le bloc compact immédiatement, sans demande préalable.
   * Pas d'aller-retour, latence minimale.
   * Un nœud ne sélectionne que quelques pairs en mode high bandwidth (typiquement 3)
