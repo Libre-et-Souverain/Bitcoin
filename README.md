@@ -1,6 +1,6 @@
 # Construisez votre nœud Bitcoin "from scratch *" puis devenez un gardien souverain
 
-**\* construire soi-même : compiler le code source de toutes les applications critiques et paramétrer le tout pour une sécurité et une confidentialité satisfaisantes.**
+**\* construire soi-même : compiler le code source des applications critiques et paramétrer le tout pour une sécurité et une confidentialité satisfaisantes.**
 
 
 # Matériel dédié
