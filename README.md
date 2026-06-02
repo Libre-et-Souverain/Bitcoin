@@ -98,7 +98,7 @@ sudo hdparm -Tt /dev/nvme0n1
 | Timing cached reads:   15686 MB in  1.98 seconds = 7906.21 MB/sec |
 | Timing buffered disk reads: 7534 MB in  3.00 seconds = **2511.01 MB/sec** |
 
-| **Desktop PC** i5-6600K **/ Disque dur 7200 tr/mn sur port sata :** |
+| **A titre de comparaison** **/ Disque dur 7200 tr/mn sur port sata :** |
 |----|
 | Timing cached reads:   32956 MB in  1.97 seconds = 16706.10 MB/sec |
 | Timing buffered disk reads: 568 MB in  3.00 seconds = **189.05 MB/sec** |
@@ -756,13 +756,18 @@ Pour arrêter : `bitcoin-cli stop` et attendre l'apparition dans les log de `Shu
 
 Savoir où en est votre nœud : `bitcoin-cli getblockchaininfo`
 
+* `blocks` : Nombre de blocs validés par le nœud. (1 bloc = jusqu'à environ 4 Mo)
+* `headers` : Nombre d'entêtes de blocs connues par le nœud. ( 1 header = 80 octets)
+* `initialblockdownload` : téléchargement initial des blocs, vrai ou faux
+* Le nœud est synchronisé si `blocks == headers` et que `initialblockdownload = false`
+
 Informations réseau : `bitcoin-cli getnetworkinfo | less`
 
 Voir le nombre d'adresses connues par votre nœud : `bitcoin-cli -addrinfo`
 
 Évaluer le trafic réseau : `bitcoin-cli getnettotals`
 
-Informations sur le wallet qui vient avec bitcoind : `bitcoin-cli getwalletinfo`
+Informations sur le wallet qui vient avec `bitcoind` : `bitcoin-cli getwalletinfo`
 
 ## Détail des connexions réseau
 
@@ -2291,9 +2296,9 @@ Au chapitre "Détail des connexions réseau" avec la commande `bitcoin-cli -neti
 
 ## CPU
 
-Central Processor Unit (CPU), aussi appelé microprocesseur ou processeur central, est la puce responsable de l'exécution du code binaire produit par un compilateur à partir du code source d'un programme informatique. Le CPU est un circuit intégré généraliste à logique non câblée, ce qui signifie qu'il n'est pas spécialisé dans un domaine particulier et qu'il peut effectuer une grande variété de tâches. Cette polyvalence lui permet de "savoir tout faire", mais il n'est pas optimisé pour des opérations spécifiques.
+Central Processor Unit (CPU), aussi appelé microprocesseur ou processeur central, est la puce qui exécute le code binaire produit par le compilateur à partir du code source d'un programme informatique. Le CPU est un circuit intégré généraliste à logique non câblée, ce qui signifie qu'il n'est pas spécialisé dans un domaine particulier et qu'il peut effectuer une grande variété de tâches. Cette polyvalence lui permet de "savoir tout faire", mais il n'est pas optimisé pour des opérations spécifiques.
 
-À l'opposé, les puces spécialisées à logique câblée, telles que les ASIC (Application Specific Integrated Circuit), sont conçues pour exécuter très rapidement un nombre restreint de tâches spécifiques. Par exemple, les ASIC destinés au minage de Bitcoin sont spécialement conçus pour résoudre l'algorithme de hachage sécurisé SHA-256 (Secure Hash Algorithm-256), qui est l'algorithme utilisé dans le mécanisme de preuve de travail (Proof of Work) de Bitcoin. Ces ASIC surpassent largement les CPU et même les GPU en termes d'efficacité et de vitesse pour le minage de Bitcoin, ce qui les rend indispensables dans les opérations de minage à grande échelle.
+À l'opposé, les puces spécialisées à logique câblée appelés ASIC (Application Specific Integrated Circuit), sont conçues pour exécuter très rapidement un nombre restreint de tâches spécifiques. Les ASIC destinés au minage de Bitcoin sont spécialement prévus pour résoudre l'algorithme de hachage sécurisé SHA-256 (Secure Hash Algorithm-256) utilisé dans le mécanisme de preuve de travail (Proof of Work) de Bitcoin. Ils surpassent largement les CPU et même les GPU en termes d'efficacité et de vitesse. Ces matériels sont devenus incontournables pour miner et ainsi espérer être à l'origine de la création d'un nouveau bloc.
 
 ## Fingerprinting
 
@@ -2394,7 +2399,6 @@ Un "full node" conserve l'UTXO set (ensemble de toutes les sorties de transactio
 ## of Satoshi Nakamoto's paper
 
 We have proposed a system for electronic transactions without relying on trust. We started with the usual framework of coins made from digital signatures, which provides strong control of ownership, but is incomplete without a way to prevent double-spending. To solve this, we proposed a peer-to-peer network using proof-of-work to record a public history of transactions that quickly becomes computationally impractical for an attacker to change if honest nodes control a majority of CPU power. The network is robust in its unstructured simplicity. Nodes work all at once with little coordination. They do not need to be identified, since messages are not routed to any particular place and only need to be delivered on a best effort basis. Nodes can leave and rejoin the network at will, accepting the proof-of-work chain as proof of what happened while they were gone. They vote with their CPU power, expressing their acceptance of valid blocks by working on extending them and rejecting invalid blocks by refusing to work on them. Any needed rules and incentives can be enforced with this consensus mechanism.
-
 
 ## du papier de Satoshi Nakamoto
 
