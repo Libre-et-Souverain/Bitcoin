@@ -185,11 +185,13 @@ git clone https://github.com/bitcoinknots/bitcoin.git # Pour Bitcoin Knots
 * 'v28.0' Core, pour la dernière "final" qui intègre des améliorations et des correctifs.
 * 'v27.1' Core, l'avant-dernière "final", contient des correctifs pour l'essentiel.
 
-- [ ] **en Décembre 2025** : l'année 2025 a vu apparaître une crise du spam avec OP_RETURN. OP_RETURN est un opcode ou une instruction dans le langage de script de Bitcoin qui permet d'intégrer des données arbitraires dans une sortie de transaction que l'on ne peut pas dépenser. Cela signifie que ces données sont stockées sur la blockchain sans créer une sortie valide qui pourrait être réclamée plus tard. Historiquement OP_RETURN a été introduit en mars 2014 dans Bitcoin Core 0.9 pour permettre l'ajout de petites quantités de données comme des preuves de timestamp, des métadonnées ou des hachages pour des applications comme le notaire virtuel, tout en évitant le spam sur le réseau. La limite standard de relais (relay policy) était de 80 octets par OP_RETURN pour empêcher une surcharge de la blockchain avec des données inutiles. La version Bitcoin Core 30.0 sortie en octobre 2025 (en paramétrage par défaut = comparer ce qui est comparable) lève cette limite historique en autorisant de multiples OP_RETURN et en les limitant à 100 000 octets au lieu de 80 ;  pour résumer la limitation des données non financières dans un bloc est tenue par celle de la taille des blocs à 4 000 000 WU (BIP141 / SegWit adopté en 2017). Les débats autour d'OP_RETURN portent souvent sur l'équilibre entre nouvelles fonctionnalités (les inscriptions, les tokens, finance décentralisée, etc … ) et la protection contre le spam, qui pourrait gonfler la blockchain et augmenter les coûts pour les utilisateurs ordinaires. A l'opposé de Bitcoin Core v30.0, il y a [Bitcoin Knots](https://github.com/bitcoinknots/bitcoin) un fork de Bitcoin Core orienté décentralisation et filtrage des transactions considérées comme abusives, par défaut OP_RETURN y est limité à 80 octets. 
+- [ ] **en Décembre 2025** : l'année 2025 a vu apparaître une crise du spam avec OP_RETURN. OP_RETURN est un opcode ou une instruction dans le langage de script de Bitcoin qui permet d'intégrer des données arbitraires dans une sortie de transaction que l'on ne peut pas dépenser. Cela signifie que ces données sont stockées sur la blockchain sans créer une sortie valide qui pourrait être réclamée plus tard. Historiquement OP_RETURN a été introduit en mars 2014 dans Bitcoin Core 0.9 pour permettre l'ajout de *petites quantités* de données. Ces données non directement monétaires ont des cas réels d'usage : des preuves de timestamp, des hachages pour des applications comme le notaire virtuel, des métadonnées comme la payload de la Tx0 Whirlpool, etc ... Avant la sortie de Bitcoin Core 30.0 d'octobre 2025 la limite standard de relais (relay policy) était de 83 octets par OP_RETURN pour empêcher une surcharge de la blockchain avec des données inutiles et qualifiables de spam. Depuis la V30 de Core (en paramétrage par défaut = comparer ce qui est comparable) cette limite historique a été levé en autorisant de multiples OP_RETURN et en les limitant à 100 000 octets au lieu de 83 (voir OP_RETURN dans le glossaire pour plus de détail) ; pour résumer, à partir de la v 30 de Core la limitation des données non financières dans un bloc est tenue par celle de la taille des blocs à 4 000 000 WU (BIP141 / SegWit adopté en 2017). Les débats autour d'OP_RETURN portent souvent sur l'équilibre entre nouvelles fonctionnalités et la protection contre le spam, qui pourrait gonfler la blockchain et augmenter les coûts pour les utilisateurs ordinaires. A l'opposé de cette permissivité amenée par Bitcoin Core en v30.0, il y a [Bitcoin Knots](https://github.com/bitcoinknots/bitcoin) un fork de Bitcoin Core orienté décentralisation et filtrage des transactions considérées comme abusives, en configuration par défaut pour une transaction l'opcode OP_RETURN est limité à une seule sortie de 83 octets. Sur [The Bitcoin Portal](https://thebitcoinportal.com/onchain/spam-analysis/overview) figure un dashboard qui distingue les transactions financières des non financières dans le temps.
 
 Le terme "Bitcoin Core" associé aux "Core Developers", peut sembler tendancieux ou chargé d'une connotation centralisatrice, comme si cette implémentation et ce groupe de développeurs étaient le "cœur" officiel et incontestable de Bitcoin, au détriment d'autres visions. Le renommage du logiciel Bitcoin en "Bitcoin Core" date de 2014. La raison officielle avancée par les développeurs de l'époque était de distinguer clairement l'implémentation logicielle du réseau Bitcoin lui-même, autrement dit pour éviter la confusion entre le protocole/réseau Bitcoin décentralisé et sans propriétaire, et son implémentation logicielle qui peut varier.
 
-Il est sain que des frictions existent. La résilience d'un réseau c'est aussi sa diversification : avant cette crise du spam seulement 1 à 2 % des [nœuds du réseau](https://coin.dance/nodes) n'utilisaient pas Bitcoin Core, fin 2025 c'est plus de 20 % qui tournent avec Bitcoin Knots. Sur [The Bitcoin Portal](https://thebitcoinportal.com/onchain/spam-analysis/overview) figure un dashboard qui distingue les transactions financières des non financières dans le temps. Ceci étant faites vos propres recherches et forgez-vous votre propre avis.
+Il est sain que des frictions existent. La résilience d'un réseau c'est aussi sa diversification : avant cette crise du spam seulement 1 à 2 % des [nœuds du réseau](https://coin.dance/nodes) n'utilisaient pas Bitcoin Core, mi 2026 c'est plus de 20 % qui tournent avec Bitcoin Knots. 
+
+- [ ] **le futur** : la guerre des blocs, la crise du spam, et j'en passe … la prochaine c'est quoi, le quantique ? Mais tout ceci est de la vrai gouvernance, normal qu'il y ait des divergences, c'est vivant et de plus c'est décentralisé ! Participez, faites vos propres recherches et forgez-vous votre propre avis.
 
 ### Options de compilation
 
@@ -1121,7 +1123,7 @@ En fonction de vos choix, modifiez la ligne `rpcauth` de `bitcoin.conf`, redéma
 
 ## La construction
 
-Le serveur et le portefeuille Electrum sont apparus en 2011, ils ont été des précurseurs dans le domaine. A l'heure actuelle il existe plusieurs variantes du serveur Electrum, j'ai choisi celle qui me semble la meilleure et la plus efficiente en terme de ressources, à savoir Electrum Rust Server (en condensé `electrs`), l'installation s'effectue sur le nœud par :
+Le serveur et le portefeuille Electrum sont apparus en 2011, ils ont été des précurseurs dans le domaine. A l'heure actuelle il existe plusieurs variantes du serveur Electrum, les plus connues sont Fulcrum et Electrs. Fulcrum offre des temps de réponse rapide même sous forte charge mais en contrepartie sa base de données est environ 5 fois plus importante que celle d'Electrs. J'ai choisi de mettre en oeuvre Electrum Rust Server (en condensé `electrs`) qui est plus efficient en terme de ressources pour l'usage recherché. L'installation s'effectue sur le nœud par :
 
 ```bash
 sudo apt-get update
@@ -2294,6 +2296,32 @@ Au chapitre "Détail des connexions réseau" avec la commande `bitcoin-cli -neti
   *  `.` signifie que le pair est en mode high bandwidth, il vous envoie les blocs compacts sans attendre que vous les demandiez.
   * `*` signifie que le pair est en mode high bandwidth et qu'il est un de vos pairs sélectionnés pour recevoir vos blocs en high bandwidth.
 
+## Consensus vs Standarness
+
+**Règles de consensus**
+
+| Caractéristique | Détail |
+|----|----|
+| **Portée** | Validité des blocs et des transactions confirmées |
+| **Qui doit être d'accord** | Tout le réseau à l'unanimité |
+| **Conséquence si violée** | Bloc rejeté → fork de chaîne potentiel |
+| **Modifiable comment** | Soft fork / hard fork (changement coordonné, lourd) |
+| **Exemples** | Poids du bloc ≤ 4 000 000 WU · plafond de 21 M de BTC · pas de double-dépense · validité des signatures · règles de script à l'exécution |
+
+Changer une règle de consensus de façon non coordonnée scinde la chaîne en deux. Si mon nœud applique des règles de consensus différentes des autres, je suis potentiellement une autre chaîne.
+
+**Règles standardness** (règle de politique)
+
+| Caractéristique | Détail |
+|----|----|
+| **Portée** | Relais, mempool, construction des templates de bloc. |
+| **Qui doit être d'accord** | Personne - c'est local, propre à chaque nœud. |
+| **Conséquence si violée** | Transaction non relayée / non minée par ce nœud ; reste valide en bloc |
+| **Modifiable comment** | Une ligne dans bitcoin.conf, puis redémarrage du nœud, aucun accord requis. |
+| **Exemples** | datacarrier / datacarriersize · nombre d'OP_RETURN · MAX_STANDARD_TX_WEIGHT (100 000 vbytes) · permitbaremultisig · minrelaytxfee · types de script « standards » |
+
+Une transaction non standard n'est pas invalide. Elle est juste refusée à la propagation par les nœuds qui appliquent cette politique. Un mineur qui ne l'applique pas peut tout à fait l'inclure dans un bloc ; et ce bloc sera accepté par tout le monde, y compris les nœuds qui auraient refusé de relayer la transaction.
+
 ## CPU
 
 Central Processor Unit (CPU), aussi appelé microprocesseur ou processeur central, est la puce qui exécute le code binaire produit par le compilateur à partir du code source d'un programme informatique. Le CPU est un circuit intégré généraliste à logique non câblée, ce qui signifie qu'il n'est pas spécialisé dans un domaine particulier et qu'il peut effectuer une grande variété de tâches. Cette polyvalence lui permet de "savoir tout faire", mais il n'est pas optimisé pour des opérations spécifiques.
@@ -2307,7 +2335,11 @@ C'est l'art de reconnaître un nœud unique à partir de ses caractéristiques, 
 * Version logicielle, services annoncés, réglages réseau.
 * Horaires et rythme de connexion.
 * Modèle de propagation des transactions.
-* Adresse I2P / Tor persistante réutilisée.
+* Adresse I2P / Tor persistante ou réutilisée.
+
+## Fulcrum
+
+Fulcrum est un serveur SPV (Simple Payment Verification) multithread haute performance pour Bitcoin (BTC), Bitcoin Cash (BCH) et Litecoin (LTC), écrit en C++20. En lançant 3 instances différentes sur une machine qui héberge les 3 nœuds complets (BTC, BCH et LTC) il sera capable de dialoguer avec le wallet Electrum et ses forks Electrum Cash et Electrum-LTC pour "transacter" sur les 3 blockchains**.** La synchronisation initiale de sa base de donnée (RocksDB) avec un full node Bitcoin est bien plus longue et bien plus consommatrice de RAM (4 à 8 Go / instance conseillé) qu'avec Elecrs. Une fois opérationnel Fullcrum est nettement plus rapide à l'usage, là ou Elecrs est plus lent, mais se distingue par sa légèreté. (© Loïc Morel - Dictionnaire de Bitcoin que vous devriez acquérir :)
 
 ## GPG
 
@@ -2331,6 +2363,48 @@ Contrairement à l'adressage IP, on ne peut pas désigner la machine propriétai
 ## IBD
 
 L'Initial Block Download est la phase de première synchronisation d'un nœud, il télécharge les blocs depuis le genesis et vérifie chaque bloc/transaction jusqu'à rattraper la chaîne la plus récente.
+
+## OP_RETURN
+
+Dans le cadre de la crise du spam débutée fin 2025 il est fait état de 80 ou parfois de 83 octets ? Les deux chiffres décrivent la même limite, 80 c'est la taille des données utiles, et 83 c'est la taille du script qui utilise 3 octets d'entête ou d'enrobage. Lorsque `datacarriersize=83` est présent dans `bitcoin.conf` cela fait référence à la taille du script, ce qui laisse 80 octets utiles pour la donnée dans ce cas comme ceci :
+
+```bash
+6a   4c   50   <80 octets de données>
+│    │    │
+│    │    └─ 0x50 = 80 en décimal : la longueur des données qui suivent
+│    └────── 0x4c = OP_PUSHDATA1 : annonce une donnée à empiler jusqu'à 255 octets
+└─────────── 0x6a = OP_RETURN : marqueur de données qui indique sortie non dépensable
+```
+
+`OP_PUSHDATA1` n'est utilisé que pour la plage de données utiles de 76 à 255 octets.
+
+En dessous de 76, on prend le push direct car il est plus court et est conforme aux règles *standardness* de Bitcoin qui est d'utiliser l'encodage le plus compact possible. Cela économise un octet, exemple de push direct avec la Tx0 Whirlpool qui nécessite 46 octets de data (46 = 0x2e en hexadécimal), le script occupe donc 48 octets (46+2)  :
+
+```bash
+6a   2e   <46 octets de données>
+│    │
+│    └─ 0x2e = pousse les 46 octets qui suivent (l'opcode EST la longueur)
+└────── 0x6a = OP_RETURN
+```
+
+A partir de Bitcoin Core 30 le défaut est porté à 100 000 octets ce qui permet théoriquement d'inclure jusqu'à 99 994 octets de données. En effet il faut utiliser 6 octets d'enrobage comme ceci :
+
+```bash
+6a   4e   9a 86 01 00   <99 994 octets de données>
+│    │    └─────┬─────┘
+│    │          └─ longueur = 99994 (4 octets)
+│    └──────────── 0x4e = OP_PUSHDATA4 (1 octet)
+└───────────────── 0x6a = OP_RETURN (1 octet)
+```
+
+Les "Core Developers" ont subtilement adopté la valeur `datacarriersize=100000` puisque calée pile sur la limite de poids de transaction. En effet les données contenues dans l'OP_RETURN sont hors témoin est pèsent 4WU, ce qui donne 400 000 WU soit la limite de la règle standarness (ou règle politique) `MAX_STANDARD_TX_WEIGHT`. En résumé on ne peut jamais réellement atteindre les 100 000 octets de script dans une transaction standard. Le maximum par transaction effectivement relayable de données OP_RETURN se situe en dessous 100 000 en fonction de la taille des entrées/sorties accompagnant la sortie data. C'est pourquoi la limite est dite « effectivement sans effet »,  c'est le poids qui tranche. Pour rappel au dessus de la règle `MAX_STANDARD_TX_WEIGHT` s'appliquant à une transaction, il y a celle s'appliquant au bloc de transactions avec la taille limite fixée à 4 000 000 WU, soit 10 fois plus. Cette dernière n'est pas politique mais fait partie des règles du consensus Bitcoin.
+
+Commandes à loger dans `bitcoin.conf` concernant OP_RETURN :
+
+* `datacarrier=1`  le nœud relaye l'opcode, cela constitue le défaut pour Core et Knots.
+* `datacarriersize=100000` défaut pour Core, depuis la v30 une transaction peut contenir plus d'un OP_RETURN, en conséquence la limite s'applique à la somme s'il y en a plusieurs. Il est a remarquer que plan v30 initial dépréciait aussi la configurabilité de ces options ; cette dépréciation a été annulée quelques heures avant la sortie, après la levée de boucliers de la communauté. Vous pouvez donc remettre l'ancien comportement avec `datacarriersize=83`, ou carrément `datacarrier=0` sans avertissement. Par contre il n'est pas possible de contrôler le nombre d'OP_RETURN par transaction.
+* `datacarriersize=83` défaut pour Knots
+* Le flag `corepolicy=1` bascule Knots vers les défauts façon Core 29.x en une seule ligne.
 
 ## PSBT
 
