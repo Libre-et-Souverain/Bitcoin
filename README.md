@@ -107,6 +107,26 @@ La première ligne est une indication sur le débit obtenu en lecture à partir 
 
 La deuxième ligne est une indication du débit que le périphérique supporte en lecture de données séquentielles sans surcharge du système de fichier. C'est cette ligne qu'il convient d'apprécier puisque dans le cas d'usage d'un nœud Bitcoin certains processus vont demander la lecture d'une très grande quantité de données.
 
+Avant d'écrire des centaines de Go sur un stockage de masse qui a un passé inconnu utilisez `smartctl` du paquet "smartmontools" pour apprécier son état de santé :
+
+```bash
+# Si besoin installer ce package
+sudo apt-get update
+sudo apt-get install smartmontools
+
+# Identifier le périphérique
+lsblk -o NAME,MODEL,SIZE
+
+# Test sur mon NVMe de 2To
+sudo smartctl -A /dev/nvme1n1
+
+=== START OF SMART DATA SECTION ===
+Data Units Written:                 44 888 895 [22,9 TB]
+Power On Hours:                     14 044
+```
+
+14 044 heures soit 585 jours ON avec 23 TB d'écriture. Donc environ 0,04 TB jour.  Si le TBW (Tera Bytes Write) annoncé par le constructeur est de 110, mon NVMe sera cuit en 2750 jours soit 7,5 ans d'usage. Le TBW du matériel est primordial pour la apprécier la durabilité, les chiffres annoncés par les fabricants varient dans de grandes proportions (bas de gamme ≈ 100 et haut de gamme > 1000).
+
 ## Performance mémoire vive
 
 ```bash
@@ -188,7 +208,7 @@ git clone https://github.com/bitcoinknots/bitcoin.git # Pour Bitcoin Knots
 * 'v28.0' Core, pour la dernière "final" qui intègre des améliorations et des correctifs.
 * 'v27.1' Core, l'avant-dernière "final", contient des correctifs pour l'essentiel.
 
-- [ ] **en Décembre 2025** : l'année 2025 a vu apparaître une crise du spam avec OP_RETURN. OP_RETURN est un opcode ou une instruction dans le langage de script de Bitcoin qui permet d'intégrer des données arbitraires dans une sortie de transaction que l'on ne peut pas dépenser. Cela signifie que ces données sont stockées sur la blockchain sans créer une sortie valide qui pourrait être réclamée plus tard. Historiquement OP_RETURN a été introduit en mars 2014 dans Bitcoin Core 0.9 pour permettre l'ajout de *petites quantités* de données. Ces données non directement monétaires ont des cas réels d'usage : des preuves de timestamp, des hachages pour des applications comme le notaire virtuel, des métadonnées comme la payload de la Tx0 Whirlpool, etc ... Avant la sortie de Bitcoin Core 30.0 d'octobre 2025 un seul OP_RETURN est autorisé par transaction avec une limite standard de relais (relay policy) de 83 octets pour empêcher une surcharge de la blockchain avec des données inutiles et qualifiables de spam. Depuis la V30 de Core cette limite historique a été levé en autorisant de multiples OP_RETURN par transaction et en les limitant à 100 000 octets au lieu de 83 (voir OP_RETURN dans le glossaire pour plus de détail) ; pour résumer, à partir de la v30 de Core la limitation des données non financières dans un bloc est tenue par celle de la taille des blocs à 4 000 000 WU (BIP141 / SegWit adopté en 2017). Les débats autour d'OP_RETURN portent souvent sur l'équilibre entre nouvelles fonctionnalités et la protection contre le spam, qui pourrait gonfler la blockchain, augmenter les coûts pour les utilisateurs ordinaires, et ainsi diminuer la dé-centralisation. A l'opposé de cette permissivité amenée par Bitcoin Core v30, laissant la porte grande ouverte aux usages non monétaires les plus divers ce qui au final éloigne Bitcoin de sa mission initiale consistant à transférer sans aucune censure de la valeur en pair à pair, il y a [Bitcoin Knots](https://github.com/bitcoinknots/bitcoin) un fork de Bitcoin Core orienté décentralisation et filtrage des transactions considérées comme abusives. Un nœud Knots ne relaie par transaction qu'un seul OP_RETURN limité par défaut à 83 octets. Sur [The Bitcoin Portal](https://thebitcoinportal.com/onchain/spam-analysis/overview) figure un dashboard qui distingue les transactions financières des non financières dans le temps.
+- [ ] **en Décembre 2025** : l'année 2025 a vu apparaître une crise du spam avec OP_RETURN. OP_RETURN est un opcode ou une instruction dans le langage de script de Bitcoin qui permet d'intégrer des données arbitraires dans une sortie de transaction que l'on ne peut pas dépenser. Cela signifie que ces données sont stockées sur la blockchain sans créer une sortie valide qui pourrait être réclamée plus tard. Historiquement OP_RETURN a été introduit en mars 2014 dans Bitcoin Core 0.9 pour permettre l'ajout de *petites quantités* de données. Ces données non directement monétaires ont des cas réels d'usage : des preuves de timestamp, des hachages pour des applications comme le notaire virtuel, des métadonnées comme la payload de la Tx0 Whirlpool, etc ... Avant la sortie de Bitcoin Core 30.0 d'octobre 2025 un seul OP_RETURN est autorisé par transaction avec une limite standard de relais (relay policy) de 83 octets pour empêcher une surcharge de la blockchain avec des données inutiles et qualifiables de spam. Depuis la V30 de Core cette limite historique a été levé en autorisant de multiples OP_RETURN par transaction et en les limitant à 100 000 octets au lieu de 83 (voir OP_RETURN dans le glossaire pour plus de détail) ; pour résumer, à partir de la v30 de Core la limitation des données non financières dans un bloc est tenue par celle de la taille des blocs à 4 000 000 WU (BIP141 / SegWit adopté en 2017). Les débats autour d'OP_RETURN portent souvent sur l'équilibre entre nouvelles fonctionnalités et la protection contre le spam, qui pourrait gonfler la blockchain, augmenter les coûts pour les utilisateurs ordinaires, et ainsi diminuer la dé-centralisation. A l'opposé de cette permissivité amenée par Bitcoin Core v30 qui laisse la porte grande ouverte aux usages non monétaires les plus divers, ce qui au final éloigne Bitcoin de sa mission initiale consistant à transférer sans aucune censure de la valeur en pair à pair, il y a [Bitcoin Knots](https://github.com/bitcoinknots/bitcoin) un fork de Bitcoin Core orienté décentralisation et filtrage des transactions considérées comme abusives. Un nœud Knots ne relaie par transaction qu'un seul OP_RETURN limité par défaut à 83 octets. Sur [The Bitcoin Portal](https://thebitcoinportal.com/onchain/spam-analysis/overview) figure un dashboard qui distingue les transactions financières des non financières dans le temps.
 
 Le terme "Bitcoin Core" associé aux "Core Developers", peut sembler tendancieux ou chargé d'une connotation centralisatrice, comme si cette implémentation et ce groupe de développeurs étaient le "cœur" officiel et incontestable de Bitcoin, au détriment d'autres visions. Le renommage du logiciel Bitcoin en "Bitcoin Core" date de 2014. La raison officielle avancée par les développeurs de l'époque était de distinguer clairement l'implémentation logicielle du réseau Bitcoin lui-même, autrement dit pour éviter la confusion entre le protocole/réseau Bitcoin décentralisé et sans propriétaire, et son implémentation logicielle qui peut varier.
 
@@ -469,7 +489,7 @@ En cas d'échec vous avez toujours accès à \[Bitcoin\] par l'ouverture de la p
 
 Les données blockchain d'un nœud complet sont imposantes (650 Go en octobre 2024), si vous ne pouvez plus mettre à jour l'Operating System ou rencontrez un problème avec celui-ci ou avec la machine elle-même, il est judicieux de séparer les données du nœud Bitcoin du reste.
 
-Si le deuxième stockage de masse n'est pas déjà monté au démarrage de la machine, utiliser la commande `lsblk -o +PTTYPE` pour obtenir le "NAME" de tous les périphériques branchés, si c'est partitionné "TYPE" indiquera `part` , s'ils sont montés ce sera indiqué à la colonne "MOUNTPOINTS", "PTTYPE" indique le type de table de partition dos ou gpt :
+Si le deuxième stockage de masse n'est pas déjà monté au démarrage de la machine, utiliser la commande `lsblk -o +PTTYPE,MODEL` pour obtenir le "NAME" de tous les périphériques branchés, si c'est partitionné "TYPE" indiquera `part` , s'ils sont montés ce sera indiqué à la colonne "MOUNTPOINTS", "PTTYPE" indique le type de table de partition dos ou gpt :
 
 * l'indicateur `dos` reporté par `lsblk` veut dire MBR (Master Boot Record), la taille de la partition sera limitée à 2 To, et c'est 4 partitions maximum, outil `fdisk`.
 * `gpt` c'est GPT (GUID Partition Table), les partitions peuvent excéder 2 To, et il est possible de créer jusqu'à 128 partitions, outil `gdisk` ou `parted`.
@@ -1545,7 +1565,7 @@ En résumé, Taproot optimise l'espace dans les blocs et a introduit des fonctio
 
 Certains diront que l'on s'éloigne vraiment de la philosophie initiale et de la simplicité originale de Bitcoin, **dans le fond ils n'ont pas tort !**
 
-A l'opposé des NFT, des contrats intelligents de la finance décentralisée, des "stablecoins" ou de l'émission de jetons BRC-20, ces nouveautés facilitent également la réalisation des couches L2 sensées effectuer des micro-transactions quasi instantanées pour des frais réduits, ce dont la couche L1 est incapable avec 7 transactions par seconde. A bien y réfléchir : les sommes importantes n'ont nullement besoin d'être déplacées à la vitesse de la lumière, donc Bitcoin L1 convient parfaitement offrant une sécurité optimale. Les petits montants n'ont pas ce besoin de sécurité poussée donc les L2 sont tout à fait adaptées pour de nombreuses transactions quasi-instantanées. Cela permet de couvrir un large spectre d'utilisation sans dénaturer le concept initial de Bitcoin et c'est tant mieux !
+A l'opposé des NFT, des "stablecoins" ou de l'émission de jetons BRC-20, des contrats intelligents de la finance décentralisée, ces évolutions facilitent également la réalisation des couches L2 sensées effectuer des micro-transactions quasi instantanées pour des frais réduits, ce dont la couche L1 est incapable avec 7 transactions par seconde. A bien y réfléchir : les sommes importantes n'ont nullement besoin d'être déplacées à la vitesse de la lumière, donc Bitcoin L1 convient parfaitement offrant une sécurité optimale. Les petits montants n'ont pas ce besoin de sécurité poussée donc les L2 sont tout à fait adaptées pour de nombreuses transactions quasi-instantanées. Cela permet de couvrir un large spectre d'utilisation sans dénaturer le concept initial de Bitcoin et c'est tant mieux !
 
 ***Retour à l'essentiel et conclusion pour le long cours*** *: sur les différents matériels et logiciels, le standard qui se dégage est SegWit native, **et même si Legacy est "vieillissant" il est très bien supporté*** ! *Ceci étant faites vos propres recherches et choisissez en connaissance de cause.*
 
@@ -1593,7 +1613,7 @@ Bilan : j'ai fait mes propres recherches, je peux générer un gros paquet d'adr
 
 ## Le portefeuille logiciel Electrum
 
-Comme dit précédemment un portefeuille est aussi, si on les lui a confiées, un coffre sécurisé contenant ses clés, le logiciel Electrum peut les générer lui même et les encrypter par un mot de passe sur le disque dur du poste de travail : *c'est le Hot Wallet*. *Remarque importante : si vous créez la seed phrase avec Electrum elle sera incompatible BIP39 (voir glossaire), les développeurs d'Electrum estiment qu'elles ne répondent pas à leurs normes de sécurité car les semences BIP39 ne comportent pas de numéro de version, ce qui compromet la compatibilité avec les futurs logiciels. Pour plus de détail voir [Electrum Seed Version System](https://electrum.readthedocs.io/en/latest/seedphrase.html). Si vous souhaitez du BIP39 utilisez un portefeuille matériel comme décrit ci-dessous ou à des fins didactiques générez avec "BIP39 tools" la seed phrase "BIP39 Mnemonic" puis créez un nouveau portefeuille avec Electrum, faites "Options" et cochez BIP39 seed.*
+Comme dit précédemment un portefeuille est aussi, si on les lui a confiées, un coffre sécurisé contenant ses clés, le logiciel Electrum peut les générer lui même et les encrypter par un mot de passe sur le disque dur du poste de travail : *c'est le Hot Wallet*. *Remarque importante : si vous créez la seed phrase avec Electrum elle sera incompatible BIP39 (voir glossaire), les développeurs d'Electrum estiment qu'elles ne répondent pas à leurs normes de sécurité car les semences BIP39 ne comportent pas de numéro de version, ce qui compromet la compatibilité avec les futurs logiciels. Pour plus de détail voir [Electrum Seed Version System](https://electrum.readthedocs.io/en/latest/seedphrase.html). Si vous souhaitez du BIP39 utilisez un portefeuille matériel comme décrit ci-dessous ou à des fins didactiques générez avec "BIP39 tools" la seed phrase "BIP39 Mnemonic" puis restaurez le portefeuille avec Electrum, faites "Options" et cochez BIP39 seed.*
 
 Electrum est également capable d'interagir avec un portefeuille matériel du type Trezor, Ledger, BitBox02, etc … les clés seront alors générées et stockées dans le dispositif, dans ce cas aucune clé privée ne sera stockée sur le poste de travail : *c'est le Cold Wallet*. A la création de votre cold wallet avec Electrum si vous avez choisi de l'encrypter avec le dispositif vous ne pourrez l'ouvrir que si le dispositif est branché et déverrouillé. Si votre choix a été de ne pas l'encrypter avec le dispositif vous pourrez l'ouvrir sans celui ci en mode spectateur uniquement, cela sous entend que certaines clés et adresses publiques seront stockées en clair sur votre disque dur.
 
@@ -1730,7 +1750,7 @@ Cette séparation des rôles est fondamentale pour la sécurité : même si votr
 * Trezor Suite propose SLIP39 Shamir en 20 mots uniquement, avec Single-Share Backup (1 seul fragment) ou du Multi-Share Backup (2 à 16 fragments), il est possible de produire le Backup Multi-Share avec Single-Share. Les deux seront valables, à l'utilisateur de détruire ensuite le Single-Backup.
 
 
-* Electrum est capable de créer un portefeuille avec un dispositif initialisé (vérification, installation du firmware et du micrologiciel Bitcoin avec Trezor Suite car à la livraison le matériel est en "bootloader mode"). Il peut initier la procédure pour nommer l'appareil et activer son code Pin. En plus de BIP39 et avec "Show expert settings" Electrum propose la seed SLIP39 Shamir ou Super Shamir avec 20 ou 33 mots. Si vous êtes vraiment un expert, est proposé en plus : avec la phrase supplémentaire (hidden wallet) ou le Seedless Mode (master seed sans backup). Une fois le portefeuille ouvert dans Electrum vous aurez accès à presque toutes les fonctionnalités fournies par le dispositif en cliquant sur l'icône dans le coin inférieur d'Electrum.
+* Electrum est capable de gérer un portefeuille avec un dispositif initialisé (vérification, installation du firmware et du micrologiciel Bitcoin avec Trezor Suite car à la livraison le matériel est en "bootloader mode"). Il peut initier la procédure pour nommer l'appareil et activer son code Pin. En plus de BIP39 et avec "Show expert settings" Electrum propose la seed SLIP39 Shamir ou Super Shamir avec 20 ou 33 mots. Si vous êtes vraiment un expert, est proposé en plus : avec la phrase supplémentaire (hidden wallet) ou le Seedless Mode (master seed sans backup). Une fois le portefeuille ouvert dans Electrum vous aurez accès à presque toutes les fonctionnalités fournies par le dispositif en cliquant sur l'icône dans le coin inférieur d'Electrum.
 
 (⁷) Les autres "Pay to" sont supportés avec un portefeuille tiers tels que Sparrow ou Electrum. 
 
@@ -1881,7 +1901,7 @@ Pour aller plus loin vous trouverez sur le net tout ce qu'il faut pour créer un
 |----|----|----|
 | Sécurité face au quantique | Suffisante en l'état actuel des perspectives | Plus sécurisée que 12 mots |
 | Praticité | Moins de mots c'est moins d'erreurs lors d'une restauration, moins d'efforts pour graver sur support métallique. | 2 fois plus longue à graver et à restaurer. |
-| Confidentialité | Discrète à stocker ou partager en cas de besoin, exemple gravure sur métal compacte. | Difficile à brute-forcer si partiellement compromise, 24 mots protègent mieux contre les fuites partielles comme une courte exposition visuelle. |
+| Confidentialité | Discrète à stocker ou partager en cas de besoin, exemple gravure sur métal compacte. | Difficile à brute-forcer si partiellement compromise, 24 mots protègent mieux que 12 contre les fuites partielles comme une courte exposition visuelle. |
 | Échappatoire | Mémorisable par un individu | Difficilement mémorisable par un individu |
 | Résistance à un oppresseur | Si forcée à divulgation, une phrase de 12 mots est vulnérable à une reconstruction partielle. | Plus complexe à retenir, potentiellement plus long à la divulgation augmentant le risque de capitulation de l'oppresseur. Reconstruction partielle plus délicate. |
 
@@ -1912,7 +1932,9 @@ sudo btrfs filesystem usage /mnt/btrfs/bitcoin
 sudo btrfs subvolume list -t /mnt/btrfs/bitcoin
 
 # Creer un READ-ONLY snapshot de la blockchain Bitcoin (subvolume snapshots deja existant)
-sudo systemctl stop bitcoin.service   # Stoppez le demon bitcoind et attendre l'invite.
+sudo systemctl stop bitcoin.service   # Stoppez le demon bitcoind
+# Attendre obligatoirement l'invite !
+# afin que bitcoind flush (parfois plusieurs Go) du cache UTXO en RAM vers le disque
 sudo btrfs subvolume snapshot -r /mnt/btrfs/bitcoin /mnt/btrfs/snapshots/bitcoin_2025-12-14_RO
 sudo systemctl start bitcoin.service   # Demarrer le demon bitcoind
 
@@ -1936,6 +1958,8 @@ A partir d'un snapshot **read-only** revenir à un état précédent (rollback)
 
 ```bash
 # /!\ ATTENTION /!\ c'est destructif pour les changements post-snapshot
+# Ne pas oublier le wallet du noeud s'il est utilisé
+  
 sudo systemctl stop electrs.service            # Stoppez electrs
 sudo systemctl stop bitcoin.service            # Stoppez le demon bitcoind
 sudo btrfs subvolume list /mnt/btrfs/bitcoin   # Identifier le snapshot
@@ -2371,7 +2395,7 @@ L'Initial Block Download est la phase de première synchronisation d'un nœud, i
 
 ## OP_RETURN
 
-Dans le cadre de la crise du spam débutée fin 2025 il est fait état de 80 ou parfois de 83 octets ? Les deux chiffres décrivent la même limite, 80 c'est la taille des données utiles, et 83 c'est la taille du script qui utilise 3 octets d'entête ou d'enrobage. Lorsque `datacarriersize=83` est présent dans `bitcoin.conf` cela fait référence à la taille du script, ce qui laisse 80 octets utiles pour la donnée dans ce cas comme ceci :
+Dans le cadre de la crise du spam il est fait état de 80 ou parfois de 83 octets ? Les deux chiffres décrivent la même limite, 80 c'est la taille des données utiles, et 83 c'est la taille du script qui utilise 3 octets d'entête ou d'enrobage. Si `datacarriersize=83` est déclaré dans `bitcoin.conf` cela fait référence à la taille du script, ce qui laisse 80 octets utiles pour la donnée dans ce cas comme ceci :
 
 ```bash
 6a   4c   50   <80 octets de données>
@@ -2383,7 +2407,7 @@ Dans le cadre de la crise du spam débutée fin 2025 il est fait état de 80 ou 
 
 `OP_PUSHDATA1` n'est utilisé que pour la plage de données utiles de 76 à 255 octets.
 
-En dessous de 76, on prend le push direct car il est plus court et est conforme aux règles *standardness* de Bitcoin qui est d'utiliser l'encodage le plus compact possible. Cela économise un octet, exemple de push direct avec la Tx0 Whirlpool qui nécessite 46 octets de data (46 = 0x2e en hexadécimal), le script occupe donc 48 octets (46+2)  :
+En dessous de 76 octets, on prend le push direct car il est plus court et est conforme aux règles *standardness* de Bitcoin qui est d'utiliser l'encodage le plus compact possible. Cela économise un octet, exemple de push direct avec la Tx0 Whirlpool qui nécessite 46 octets de data (46 = 0x2e en hexadécimal), le script occupe donc 48 octets (46+2)  :
 
 ```bash
 6a   2e   <46 octets de données>
@@ -2402,7 +2426,7 @@ Depuis Bitcoin Core 30 le défaut est actuellement de 100 000 octets ce qui perm
 └───────────────── 0x6a = OP_RETURN (1 octet)
 ```
 
-Les "Core Developers" ont subtilement adopté la valeur `datacarriersize=100000` puisque calée pile sur la limite de poids de transaction. En effet les données contenues dans l'OP_RETURN sont hors témoin est pèsent 4WU, ce qui donne 400 000 WU soit la limite de la règle standarness (ou règle politique) `MAX_STANDARD_TX_WEIGHT`. En résumé on ne peut jamais réellement atteindre les 100 000 octets dans une transaction standard. Le maximum par transaction effectivement relayable de données OP_RETURN se situe en dessous 100 000 en fonction de la taille des entrées/sorties accompagnant la sortie data. C'est pourquoi la limite est dite « effectivement sans effet »,  c'est le poids qui tranche. Pour rappel au dessus de la règle `MAX_STANDARD_TX_WEIGHT` s'appliquant à une transaction, il y a celle s'appliquant au bloc de transactions avec la taille limite fixée à 4 000 000 WU, soit 10 fois plus. Cette dernière n'est pas politique mais fait partie des règles du consensus Bitcoin.
+Les "Core Developers" ont subtilement adopté la valeur `datacarriersize=100000` par défaut puisque calée pile sur la limite de poids de transaction. En effet les données contenues dans l'OP_RETURN sont hors témoin est pèsent 4WU, ce qui donne 400 000 WU soit la limite de la règle standarness (ou règle politique) `MAX_STANDARD_TX_WEIGHT`. En résumé on ne peut jamais réellement atteindre les 100 000 octets dans une transaction standard. Le maximum par transaction effectivement relayable de données OP_RETURN se situe en dessous 100 000 en fonction de la taille des entrées/sorties accompagnant la sortie data. C'est pourquoi la limite est dite « effectivement sans effet »,  c'est le poids qui tranche. Pour rappel, au dessus de la règle `MAX_STANDARD_TX_WEIGHT` s'appliquant à une transaction, il y a celle s'appliquant au bloc de transactions avec la taille limite fixée à 4 000 000 WU, soit 10 fois plus. Cette dernière n'est pas politique mais fait partie des règles du consensus Bitcoin.
 
 Commandes à loger dans `bitcoin.conf` concernant OP_RETURN policies :
 
@@ -2411,7 +2435,7 @@ Commandes à loger dans `bitcoin.conf` concernant OP_RETURN policies :
 * `datacarriersize=100000` défaut pour Core, depuis la v30 une transaction peut contenir plus d'un OP_RETURN, en conséquence la limite s'applique à la somme s'il y en a plusieurs.
 * `datacarriersize=83` défaut pour Knots
 * Depuis Bitcoin Core V30 il n'est pas possible de relayer un seul OP_RETURN par transaction, soit c'est zéro avec `datacarrier=0` , soit le nombre d'OP_RETURN est limité par le poids.
-* Il est a remarquer que plan v30 initial dépréciait la configurabilité des options `datacarrier` et `datatcarriersize` ; cette dépréciation a été annulée quelques heures avant la sortie, après la levée de boucliers de la communauté.
+* Il est a remarquer que plan v30 initial dépréciait la configurabilité et à terme supprimer les options `datacarrier` et `datatcarriersize` ; cette dépréciation a été annulée quelques heures avant la sortie, après la levée de boucliers de la communauté.
 * Le flag `corepolicy=1` bascule Knots vers les défauts façon Core 29.x en une seule ligne. Cela supprime tous les filtres particuliers à Knots et relaie quasiment tout ce que Core 29.x relaierait.
 
 ## PSBT
@@ -2465,9 +2489,12 @@ Un "full node" conserve l'UTXO set (ensemble de toutes les sorties de transactio
 
 * [BTC TouchPoint](https://btctouchpoint.com) - le parcours en vidéos et podcasts de la chute dans le Bitcoin Rabbit Hole
 * [DSN Bitcoin monitoring](https://www.dsn.kastel.kit.edu/bitcoin/) - les vidéos de propagation des blocs à diverses époques !!!
+* Ludovic Lars [décortique ici](https://viresinnumeris.fr/limite-21-millions-but-originel-bitcoin/) le parcours de Satoshi Nakamoto pour établir l'adéquation économique de départ. Sinon le . de départ de ses nombreux articles [ici](https://viresinnumeris.fr/liste-articles/).
 * [BitcoinStrings](https://bitcoinstrings.com/) / [Bitaddress.org](https://www.bitaddress.org/) / [LearnMeBitcoin](https://learnmeabitcoin.com/)
 
 # Littérature
+
+[Traduction française du white paper](https://viresinnumeris.fr/bitcoin/)
 
 [Livre "Mastering Bitcoin" traduction française incomplète qui a le mérite d'exister](https://bitcoin.fr/wp-content/uploads/2020/08/Mastering-Bitcoin.pdf)
 
