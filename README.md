@@ -1959,7 +1959,8 @@ A partir d'un snapshot **read-only** revenir à un état précédent (rollback)
 ```bash
 # /!\ ATTENTION /!\ c'est destructif pour les changements post-snapshot
 # Ne pas oublier le wallet du noeud s'il est utilisé
-  
+
+# Arreter TOUS les sevices qui utilisent des sous volumes btrfs  
 sudo systemctl stop electrs.service            # Stoppez electrs
 sudo systemctl stop bitcoin.service            # Stoppez le demon bitcoind
 sudo btrfs subvolume list /mnt/btrfs/bitcoin   # Identifier le snapshot
@@ -2089,6 +2090,9 @@ Une nouvelle version est disponible et vous voulez effectuer la mise à jour, su
 ```bash
 # Se positionner dans le répertoire du code source d'Electrs
 cd ~/code/electrs
+
+# Afficher la version actuelle du code
+git tag | sort --version-sort | tail -n 1
 
 # Nettoyer le code source local
 git clean -xfd
@@ -2481,7 +2485,7 @@ Un "full node" conserve l'UTXO set (ensemble de toutes les sorties de transactio
 * [Bitcoin Forum](https://bitcointalk.org/)
 
 
-* [BIP 39 tool](https://github.com/iancoleman/bip39) - de "iancoleman", un outil pour convertir les phrases mnémoniques BIP39 en adresses et clés privées. Fonctionne en mode hors ligne avec un navigateur.
+* [BIP 39 tool](https://github.com/iancoleman/bip39) - de Iancoleman, un outil pour convertir les phrases mnémoniques BIP39 en adresses et clés privées. Pour plus de sécurité activer le mode hors ligne avec le navigateur. Avec Firefox faire F10 puis puis cocher "Travailler hors connection".
 
 
 * [Ur₿an.T丰ch21](https://x.com/urbantech21) - le narrateur et explorateur des archives sur Bitcoin
