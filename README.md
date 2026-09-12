@@ -144,6 +144,7 @@ Le débit indiqué ici est à rapprocher de la première ligne de la performance
 
 * Monitoring : `sudo apt-get install btop`
 * Descriptif de la machine : `sudo apt-get install fastfetch`, pour une information à l'ouverture du shell ajoutez `fastfetch` à la fin de `.bashrc`
+* Depuis une éternité il existe sous Debian un gestionnaire de fichier en mode texte, un clone de Norton Commander, que j'affectionne bien et avec lequel vous pouvez utiliser la souris en mode texte dans un terminal : "Midnight Commander" alias `mc` si cela vous tente c'est `sudo apt-get install mc` .
 
 # Logiciel Bitcoin
 
@@ -517,8 +518,11 @@ Sur mon Dell Optiplex c'est `nvme0n1` de 2To, il n'est pas monté au démarrage,
 # Obtenir le nom de la nouvelle partition (pour moi la reponse est 'nvme0n1p1')
 lsblk -o +PTTYPE
 
-# Creer le systeme de fichier, ici ext4
+# Créer le systeme de fichier, ici ext4
 sudo mkfs -t ext4 /dev/nvme0n1p1
+
+# Facultatif : donner un Label à la partition, maxi 16 caractères
+sudo e2label /dev/nvme0n1p1 Bitcoin-Part
 
 # Créer un point de montage, j'ai choisi 'nvme' dans mnt
 sudo mkdir /mnt/nvme
@@ -612,11 +616,11 @@ ls -al /mnt/btrfs
 sudo btrfs filesystem df /mnt/btrfs/bitcoin
 ```
 
-**Inconvénients de BTRFS sur Ext4** : consomme des ressources CPU, de la Ram et n'est pas adapté aux disques durs classiques. 
+**Inconvénients de BTRFS sur Ext4** : consomme des ressources CPU et de la Ram. Est moins optimal sur les disques durs mécaniques qu'il ne l'est sur les non mécaniques.
 
 **Avantages de BTRFS sur Ext4** : très bien adapté au stockage de masse hors rotatif comme les SSD et les NVMe. BTRFS intègre une fonctionnalité très puissante, les snapshots : ils sont très rapides et économes en espace car seul les changements sont stockés ce qui est parfait pour des backups avec snapshot read-only ou des tests avec snapshot writable (modifier la copie sans affecter l'original grâce au Copy-on-Write). Effectuer un snapshot de toute la blockchain Bitcoin peut s'avérer utile lors d'une mise à jour de version de `bitcoind`. Autres avantages : compression transparente, checksums pour détecter les corruptions, subvolumes, optimisé pour SSD / NVMe avec maintien des performances et prolongation de la durée de vie. Avec le kernel 6.12 de Debian 13 (Trixie) toutes les options SSD / NVMe utiles pour l'usage d'un nœud Bitcoin sont activées par défaut sauf `noatime` (Debian monte les BTRFS avec `relatime` par défaut). Pour vérifier ces options, faire `mount | grep btrfs`.
 
-Redémarrer la machine par `sudo shutdown -r now` et vérifier que le périphérique est bien monté automatiquement. Pour copier des fichiers et faire tout un tas de choses (y compris tout massacrer), depuis une éternité il existe sous Debian un gestionnaire de fichier en mode texte, un clone de Norton Commander, que j'affectionne bien et avec lequel vous pouvez utiliser la souris en mode texte dans un terminal : "Midnight Commander" alias `mc` si cela vous tente c'est `sudo apt-get install mc` .
+Redémarrer la machine par `sudo shutdown -r now` et vérifier que le périphérique est bien monté automatiquement. 
 
 Pour finir, si le répertoire `~/.bitcoin` est présent vérifiez qu'il soit vide, ensuite supprimez le. Créez un lien symbolique appelé `.bitcoin` dans le home de l'utilisateur qui lancera le nœud Bitcoin, et qui pointera vers votre unité de stockage dédié à cela.
 
@@ -2137,7 +2141,7 @@ Observer les logs, tout est correct ? alors fermer les terminaux.
 
 ## maj Appimage sur le Desktop Linux
 
-Avant de mettre à jour, effectuez une copie de sauvegarde de l'Appimage. Si la fonctionnalité de mise à jour est disponible dans l'application elle même, activez là et en principe plus besoin de vérifier l'authenticité. Sinon téléchargez la nouvelle version, vérifiez son authenticité, puis installez comme pour la première fois, pour finir mettez à jour le nom dans le lanceur si vous en avez crée un la première fois. Les paramètres utilisateur sont en principe à l'abri puisque séparés dans des répertoires `~/.nom_d-appimage` ou dans `~/.config/nom_d-appimage`
+Effectuez une copie de sauvegarde de l'Appimage avant une mise à jour. Si la fonctionnalité de mise à jour est disponible dans l'application elle même, procédez et bien qu'en principe il n'y ai plus besoin de vérifier l'authenticité et l'intégrité de l'Appimage, il est quand même souhaitable de vérifier au moins l'intégrité. Sinon téléchargez la nouvelle version, vérifiez son authenticité, puis installez comme pour la première fois, pour finir mettez à jour le nom dans le lanceur si vous en avez crée un la première fois. N'oubliez pas de rendre la nouvelle Appimage exécutable. Les paramètres utilisateur sont en principe à l'abri puisque séparés dans des répertoires `~/.nom_d-appimage` ou dans `~/.config/nom_d-appimage`
 
 Exemple avec Trezor-suite :
 
@@ -2169,18 +2173,23 @@ chmod +x Trezor-Suite-X.x.x-linux-x86_64.appimage
 
 ## 1Mo
 
-Le Méga Octet (ou Mio le [mébioctet pour les puristes](https://fr.wikipedia.org/wiki/Octet) et dans tout ce document Mo=Mio) permet de quantifier la taille que des données occupent sur un support de stockage. Le bit, qui est contraction de **binary digit,** est la plus petite unité de données dans un ordinateur, qui peut avoir une valeur de 0 ou 1, éteint ou allumé, off / on. Ensuite vient l'octet (`oct` pour 8, `et` pour petit) qui rassemble 8 bits. A partir de là, le passage d'une grandeur à l'autre est toujours x 1024 :
+Le Méga Octet permet de quantifier la taille que des données occupent sur un support de stockage. Le bit, qui est contraction de **binary digit,** est la plus petite unité de données dans un ordinateur, qui peut avoir une valeur de 0 ou 1, éteint ou allumé, off / on. Ensuite vient l'**octet** (`oct` pour 8, `et` pour petit) qui rassemble 8 bits. A partir de là, **le passage d'une grandeur à l'autre est toujours x 1024** :
 
-* 1 Ko (Kio) (Kilo Octet) : 1024 octets / 2¹⁰ octets ou de 00 0000 0000 à 11 1111 1111
-* 1 Mo (Mio) (**Méga Octet**): 1024 Ko / 2²⁰ octets
-* 1 Go (Gio) (Giga Octet): 1024 Mo / 2³⁰ octets
-* 1 To (Tio) (Tera Octet) : 1024 Go / 2⁴⁰ octets
+* 1 Ko (KiB ) (Kilo Octet) : 1024 octets / 2¹⁰ octets ou de 00 0000 0000 à 11 1111 1111
+* 1 Mo (MiB) (**Méga Octet**): 1024 Ko / 2²⁰ octets
+* 1 Go (GiB) (Giga Octet): 1024 Mo / 2³⁰ octets
+* 1 To (TiB) (Tera Octet) : 1024 Go / 2⁴⁰ octets
 
 La question qui tue, pourquoi x 1024 et pas x 1000 ?
 
 * Les ordinateurs fonctionnent sur un système binaire, qui utilise des puissances de 2.
 * 1024 est une puissance de 2, ce qui en fait une valeur naturelle dans le contexte binaire.
 * choisir 1000 aurait cassé la facilité de compréhension et de manipulation de ces ^2.
+
+Si vous tombez sur : 
+
+* GB c'est en base 10 soit 1 000 000 000 octets qui est basé sur le système métrique international, utilisé par les fabricants de matériel pour indiquer la capacité des disques durs et SSD, c'est un faux ami pour moi.
+* GiB c'est en base 2 soit 1 073 741 824 octets (1024 x 1024 x 1024), c'est celui que j'utilise içi.
 
 ## Base 16
 
