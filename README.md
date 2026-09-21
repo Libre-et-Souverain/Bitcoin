@@ -616,6 +616,8 @@ ls -al /mnt/btrfs
 sudo btrfs filesystem df /mnt/btrfs/bitcoin
 ```
 
+Voir le système de fichier : `lsblk -o +FSTYPE`
+
 **Inconvénients de BTRFS sur Ext4** : consomme des ressources CPU et de la Ram. Est moins optimal sur les disques durs mécaniques qu'il ne l'est sur les non mécaniques.
 
 **Avantages de BTRFS sur Ext4** : très bien adapté au stockage de masse hors rotatif comme les SSD et les NVMe. BTRFS intègre une fonctionnalité très puissante, les snapshots : ils sont très rapides et économes en espace car seul les changements sont stockés ce qui est parfait pour des backups avec snapshot read-only ou des tests avec snapshot writable (modifier la copie sans affecter l'original grâce au Copy-on-Write). Effectuer un snapshot de toute la blockchain Bitcoin peut s'avérer utile lors d'une mise à jour de version de `bitcoind`. Autres avantages : compression transparente, checksums pour détecter les corruptions, subvolumes, optimisé pour SSD / NVMe avec maintien des performances et prolongation de la durée de vie. Avec le kernel 6.12 de Debian 13 (Trixie) toutes les options SSD / NVMe utiles pour l'usage d'un nœud Bitcoin sont activées par défaut sauf `noatime` (Debian monte les BTRFS avec `relatime` par défaut). Pour vérifier ces options, faire `mount | grep btrfs`.
@@ -1497,18 +1499,17 @@ J'ai obtenu cela en téléchargeant les sources de Bitcoin Knots et en effectuan
 
 [Tableau d'utilisation des "Pay to"](https://unchained.com/blog/bitcoin-address-types-compared/?utm_campaign=btcmag-launch) depuis l'origine de Bitcoin
 
-| **Type** | **1 ère vue** | **En % de l'offre BTC ¹** | **Utilisation ¹** | Appellation courante | **Encodage** | **Préfixe addr** |
-|----|----|----|----|----|----|----|
-| P2PK | Jan 2009 | 9% (1.7M) | Obsolète | aucune c'est P2PK | Base16 | 1 |
-| P2PKH | Jan 2009 | 43% (8.3M) | Diminue | Legacy | Base58 | 1 |
-| P2SH | Apr 2012 | 24% (4.6M) | Diminue | aucune c'est P2SH | Base58 | 3 |
-| P2WPKH | Aug 2017 | 20% (3.8M) | Augmente | SegWit ² | Bech32 | bc1q |
-| P2WSH | Aug 2017 | 4% (0.8M) | Augmente | SegWit ² (P2WSH) | Bech32 | bc1q |
-| P2TR | Nov 2021 | 0.1% (0.02M) | Augmente | Taproot | Bech32m | bc1p |
+| **Type** | **1 ère vue** | **En % de l'offre BTC ¹** | **Utilisation ¹** | Appellation courante | **Encodage** | **Préfixe d'adresse** | Nbre de caractères |
+|----|----|----|----|----|----|----|----|
+| P2PK | Jan 2009 | 9% (1.7M) | Obsolète | Pay to Public Key | Aucun | Aucun |    |
+| P2PKH | Jan 2009 | 43% (8.3M) | Diminue | Adresse Legacy | Base58 | 1 | 26-34 |
+| P2MS | Jan 2012 | Négligeable | Obsolète | Multisig nu | Aucun | Aucun |    |
+| P2SH | Apr 2012 | 24% (4.6M) | Diminue | Adresse script | Base58 | 3 | 34 |
+| P2WPKH | Aug 2017 | 20% (3.8M) | Augmente | SegWit natif | Bech32 | bc1q | 42 |
+| P2WSH | Aug 2017 | 4% (0.8M) | Augmente | SegWit natif script | Bech32 | bc1q | 62 |
+| P2TR | Nov 2021 | 0.1% (0.02M) | Augmente | Taproot | Bech32m | bc1p | 62 |
 
 ¹ valable pour l'année 2024, ces données sont sujettes au changement
-
-² SegWit employé tout seul veut dire ici Native SegWit
 
 
 Description des `Pay to` :
@@ -1740,9 +1741,9 @@ Cette séparation des rôles est fondamentale pour la sécurité : même si votr
 
 (²) Pas tout à fait, il existe une alternative avec [Bacca](https://github.com/darosior/ledger_installer).
 
-(³) Comme indiqué sur le portail Ledger, sous Linux il est nécessaire de fixer les règles UDEV par : `wget -q -O - https://raw.githubusercontent.com/LedgerHQ/udev-rules/master/add_udev_rules.sh | sudo bash`
+(³) Après avoir déverrouillé le dispositif et lancé l'app Bitcoin, sous Linux il sera parfois nécessaire de fixer les règles UDEV par : `wget -q -O - https://raw.githubusercontent.com/LedgerHQ/udev-rules/master/add_udev_rules.sh | sudo bash` (comme indiqué sur le portail Ledger) 
 
-(⁴) **Bien que non expliqué sur le site du fabricant**, sur mon Desktop Linux il a été nécessaire de fixer les règles UDEV avec un script téléchargeable [ici](https://github.com/BitBoxSwiss/bitbox-wallet-app/blob/master/frontends/qt/resources/deb-afterinstall.sh), si vous utilisez seulement BitBox02 commentez les deux lignes sous `# BitBox V1 udev rules` rendez le exécutable par `chmod u+x deb-afterinstall.sh` puis lancez le par `sudo ./deb-afterinstall.sh`. Heureusement que certains se sont donné la peine avec [ceci](https://github.com/spesmilo/electrum/tree/master/contrib/udev) ou est répertorié les règles UDEV pour la majorité des hardwares wallets. Pour lister toutes les règles que vous avez mis en place : `sudo ls /etc/udev/rules.d/`
+(⁴) **Bien que non explicite sur le site du fabricant**, sous Linux il sera parfois nécessaire de fixer les règles UDEV avec un script téléchargeable [ici](https://github.com/BitBoxSwiss/bitbox-wallet-app/blob/master/frontends/qt/resources/deb-afterinstall.sh), si vous utilisez seulement BitBox02 commentez les deux lignes sous `# BitBox V1 udev rules` rendez le exécutable par `chmod u+x deb-afterinstall.sh` puis lancez le par `sudo ./deb-afterinstall.sh`. Heureusement que certains se sont donné la peine avec [ceci](https://github.com/spesmilo/electrum/tree/master/contrib/udev) ou est répertorié les règles UDEV pour la majorité des hardwares wallets. Pour lister toutes les règles que vous avez mis en place : `sudo ls /etc/udev/rules.d/`
 
 (⁵) BitBox02 est le seul dispositif que j'ai testé qui permet de voir plus d'une fois la seed phrase :
 
@@ -1903,10 +1904,10 @@ Pour aller plus loin vous trouverez sur le net tout ce qu'il faut pour créer un
 
 | **Face à** | **Phrase de 12 mots** | **Phrase de 24 mots** |
 |----|----|----|
-| Sécurité face au quantique | Suffisante en l'état actuel des perspectives | Plus sécurisée que 12 mots |
+| Sécurité face au quantique | Hors de portée, donc suffisante en l'état actuel des perspectives. | 24 mots donnent une marge sans discussion. |
 | Praticité | Moins de mots c'est moins d'erreurs lors d'une restauration, moins d'efforts pour graver sur support métallique. | 2 fois plus longue à graver et à restaurer. |
 | Confidentialité | Discrète à stocker ou partager en cas de besoin, exemple gravure sur métal compacte. | Difficile à brute-forcer si partiellement compromise, 24 mots protègent mieux que 12 contre les fuites partielles comme une courte exposition visuelle. |
-| Échappatoire | Mémorisable par un individu | Difficilement mémorisable par un individu |
+| Échappatoire | Mémorisable par un individu | Plus difficilement mémorisable par un individu |
 | Résistance à un oppresseur | Si forcée à divulgation, une phrase de 12 mots est vulnérable à une reconstruction partielle. | Plus complexe à retenir, potentiellement plus long à la divulgation augmentant le risque de capitulation de l'oppresseur. Reconstruction partielle plus délicate. |
 
 # Les mises à jour
@@ -2048,7 +2049,7 @@ tail -f ~/.bitcoin/debug.log
 sudo systemctl stop electrs.service
 sudo systemctl stop bitcoin.service
 
-# Pour bitcoind vous avez vu "Shutdown: done" dans les logs ? Poursuivez
+# Pour bitcoin vous avez vu "Shutdown: done" dans les logs ? Poursuivez
 # sinon attendez parfois qq min
 
 # Ne pas lancer la nouvelle version de bitcoind en mode démon, éditer bitcoin.conf
