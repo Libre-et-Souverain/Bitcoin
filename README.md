@@ -1,9 +1,10 @@
 # Construisez votre nœud Bitcoin "from scratch *" puis devenez un gardien souverain
 
+\
 **\* construire soi-même : compiler le code source des applications critiques et paramétrer le tout pour une sécurité et une confidentialité satisfaisantes.**
 
 
-# Matériel et OS
+# Hardware et Operating System
 
 Afin d'éviter toute déconvenue il est souhaitable de commencer par là.
 
@@ -61,9 +62,9 @@ Dell Optiplex 5050 SFF
 * Consommation 11.2 W (moyenne relevée sur 15 jours)
 * Alimentation secourue : onduleur. Si l'onduleur est capable de dialoguer avec le PC, vous avez upsmon pour arrêter le système proprement en cas de coupure prolongée. Et puis oui les onduleurs c'est pénible et coûteux dans le temps. Soit on change les batteries au plomb tous les 4 à 5 ans, soit on s'aperçoit qu'il faut changer la batterie lorsque y a une coupure puisque l'onduleur n'a pas fait son boulot et que le système s'est arrêté en vrac ! Suivant le camp ou vous vous situez ne mettez pas d'onduleur … ou bien regardez du côté des stations d'énergie à batterie LiFePO4 dont la durée de vie est en principe > 10 ans.
 
-## Installation du système d'exploitation
+## Operating System
 
-Vous trouverez sur le net de bons tutoriels pour installer le système d'exploitation. L'Open Source n'est pas une idéologie ou une méthode, c'est un rempart pour l'individu dans le cyberespace face à la centralisation et au contrôle. Le système d'exploitation est une des premières briques, donc tout comme le code source de Bitcoin il est plus que souhaitable d'utiliser un OS Open Source, Linux est le choix le plus pratique et le plus répandu. Ici également visez la simplicité, pas d'interface graphique, pas de fioritures inutiles, juste l'essentiel. La machine sera entièrement dédiée à la fonctionnalité de nœud. Par choix à l'installation j'ai créé un seul utilisateur que j'ai appelé 'btc-node'. Pour finir, juste 3 "tips" sur PC si vous avez choisi Debian la mère des distributions Linux :
+Vous trouverez sur le net de bons tutoriels pour installer le système d'exploitation. L'Open Source n'est pas une idéologie ou une méthode, c'est un rempart pour l'individu dans le cyberespace face à la centralisation et au contrôle. Le système d'exploitation est une des premières briques, donc tout comme le code source de Bitcoin il est plus que souhaitable d'utiliser un OS Open Source, Linux est le choix le plus pratique et le plus répandu. Ici également visez la simplicité, pas d'interface graphique, pas de fioritures inutiles, juste l'essentiel. La machine sera entièrement dédiée à la fonctionnalité de nœud. Par choix à l'installation j'ai créé un seul utilisateur que j'ai appelé "btc-node". Pour finir, juste 3 "tips" sur PC si vous avez choisi Debian la mère des distributions Linux :
 
 * si vous préférez utiliser sudo : à "root password" laissez le champ vide, cela installe sudo et l'utilisateur que vous allez renseigner ensuite se verra attribuer les droits.
 * Ext4 est par défaut le type de partition utilisé à l'installation de l'OS, ok pour moi.
@@ -869,7 +870,7 @@ Colonne type, indique le type de chaque connexion :
 
 * **vide**, rien est normal, c'est une connection entrante `inbound`.
 * **full**, `outbound-full-relay` relais complet, le type par défaut. Mon nœud choisit ce pair au hasard dans son carnet d'adresses et échange tout avec lui : blocs, transactions, adresses. Son rôle est remplir mon mempool, de diffuser mes transactions, de découvrir des pairs.
-* **block**, `block-relay-only` relais de blocs uniquement\*\*.  Le\*\* choix effectué au hasard comme `full` sauf que cette connexion échange uniquement des blocs. Environ toutes les 5 minutes, une connexion `block`supplémentaire est ouverte pour vérifier qu'aucun bloc ne manque, puis refermée. C'est une protection discrète contre l'attaque éclipse (voir plus tard le glossaire), puisque contrairement à `full` ce type est invisible aux techniques d'analyse du trafic. Lors de son arrêt,`bitcoind` écrit dans le fichier `anchors.dat` les adresses de ses connexions `block-relay-only`, au maximum 2. Lors de son démarrage, il lit le fichier, se reconnecte en priorité à ces 2 adresses puis le supprime le fichier.
+* **block**, `block-relay-only` relais de blocs uniquement.  Le choix effectué au hasard comme `full` sauf que cette connexion échange uniquement des blocs. Environ toutes les 5 minutes, une connexion `block`supplémentaire est ouverte pour vérifier qu'aucun bloc ne manque, puis refermée. C'est une protection discrète contre l'attaque éclipse (voir plus tard le glossaire), puisque contrairement à `full` ce type est invisible aux techniques d'analyse du trafic. Lors de son arrêt,`bitcoind` écrit dans le fichier `anchors.dat` les adresses de ses connexions `block-relay-only`, au maximum 2. Lors de son démarrage, il lit le fichier, se reconnecte en priorité à ces 2 adresses puis le supprime le fichier.
 * **feeler**, `feeler` connexion de courte durée pour tester les adresses du carnet. Si le pair répond, l'adresse passe de la table '"new" à la table "tried" et la connexion est fermée tout de suite. Son rôle est de garder le carnet d'adresses sain, avec des adresses testées qui fonctionnent.
 * addr, `addr-fetch`, connexion de courte durée pour demander des adresses. Elle est utilisée au démarrage quand le carnet est vide, ou quand un réseau manque de pairs connus. Avec Tor et i2p only les DNS seeds ne sont pas utilisables directement, donc ce mécanisme compte davantage.
 * **manual**, `manual` pair ajouté manuellement. Définie soit par `addnode` ou `connect` dans `bitcoin.conf`, soit en ligne de commande par `bitcoin-cli addnode <addr:port> add`, `addr` peut être une adresse IPV4/6, Tor, I2P, suivi du port facultatif (default 8333). `connect` déactive toutes les connexions automatiques `full`, `block`, `feeler` et les anchors, à éviter sauf pour des configurations particulières. Voici les subtilités de la commande `addnode` :
@@ -1092,6 +1093,8 @@ Bien qu'Il soit possible de créer un wallet directement avec votre nœud Bitcoi
 Ensuite gardez à l'esprit que votre nœud est constamment connecté à internet et donc exposé à des risques potentiels. Si le wallet intégré à `bitcoind` est utilisé (directement ou avec la librairie Cormorant), cela peut faire de vous une cible si votre solde est découvert.
 
 Afin d'élargir le choix des portefeuilles utilisables, il est opportun d'installer un serveur Electrum sur le nœud Bitcoin. Il sera ensuite possible d'utiliser le portefeuille Electrum ou un autre pourvu qu'il soit compatible avec le format SPV d'Electrum. Lorsque la date de naissance du portefeuille est inconnue (date de la 1 ère transaction) toute la blockchain doit être parcourue depuis l'origine. Le format SPV permet d'obtenir le solde d'un wallet Bitcoin bien plus rapidement que l'utilisation directe ou indirecte du wallet de Bitcoin et ce même avec `blockfilterindex` activé.
+
+*Par la suite si vous utilisez un hardware wallet cela vous permettra de connecter l'App de gestion de celui-ci à votre propre serveur Electrum au lieu d'utiliser les serveurs du fabricant de ce matériel.*
 
 Avant de se lancer dans d'autres installations, et que l'un n'empêche pas l'autre, ci-dessous la configuration `bitcoin.conf` pour une connexion directe portefeuille au nœud Bitcoin par RPC (Remote Procedure Call ou appel de procédure distante).
 
@@ -1520,9 +1523,7 @@ HiddenServicePort 50001 127.0.0.1:50001
 
 # Les portefeuilles
 
-En interagissant avec la blockchain Bitcoin un portefeuille permet de visualiser son solde, de visualiser ses transactions passées, d'initier de nouvelles transactions puis de les signer et de les propager, de visualiser ses adresses de réception qui ont été générées avec ses clés elles mêmes générées avec sa seed phrase. Un portefeuille est aussi un coffre-fort contenant ses clés. **Afin d'appréhender correctement ce qu'est un portefeuille il est nécessaire de comprendre certaines notions. Cela permettra également de faire des choix en connaissance de cause.**
-
-*Dans le répertoire Docs vous trouverez au format pdf une fiche de récupération qui vous guidera dans la sauvegarde des mots générés à la création de votre wallet. Egalement présent une lettre d'héritage afin qu'une personne de confiance puisse envisager de retrouver l'accès à vos bitcoins en auto-garde. Ces deux documents n'ont aucune valeur juridique, sont le fruit de mon esprit, ne sont peut être pas adaptés à votre cas. L'auto-garde de ses fonds sans intermédiaire incarne la souveraineté dans toute sa splendeur mais exige une rigueur sans faille. Faites fonctionner votre cerveau, cela constituera votre meilleure protection dans le temps.*
+En interagissant avec la blockchain Bitcoin un portefeuille permet de visualiser son solde, de visualiser ses transactions passées, d'initier de nouvelles transactions puis de les signer afin que votre nœud les propage, de visualiser ses adresses publiques qui ont été générées avec ses clés elles mêmes générées avec sa seed phrase. Un portefeuille est aussi un coffre-fort contenant ses clés. **Afin d'appréhender correctement ce qu'est un portefeuille il est nécessaire de comprendre certaines notions. Cela permettra également de faire des choix en connaissance de cause.**
 
 ## Seed phrase
 
@@ -1533,6 +1534,8 @@ La seed phrase a grandement simplifié et sécurisé la gestion des clés en per
 Le concept de seed phrase a été officiellement standardisé en 2013 avec le protocole **BIP-39** (Bitcoin Improvement Proposal). BIP-39 a été proposé par Marek Palatinus (alias Slush), Pavol Rusnak (alias Stick), et d'autres membres de la communauté Bitcoin.
 
 La norme de seed phrase BIP39 est la plus utilisée, et donc la plus universelle pour le moment.
+
+*Dans le répertoire Docs vous trouverez au format pdf une fiche de récupération qui vous guidera dans la sauvegarde des mots générés à la création de votre wallet. Egalement présent une lettre d'héritage afin qu'une personne de confiance puisse envisager de retrouver l'accès à vos bitcoins en auto-garde. Ces deux documents n'ont aucune valeur juridique, sont le fruit de mon esprit, ne sont peut être pas adaptés à votre cas. L'auto-garde de fonds sans intermédiaire incarne la souveraineté dans toute sa splendeur mais exige une rigueur sans faille. Faites fonctionner votre cerveau, cela constituera votre meilleure protection dans le temps.*
 
 ## Choix du "Pay to"
 
@@ -1622,7 +1625,9 @@ Certains diront que l'on s'éloigne vraiment de la philosophie initiale et de la
 
 A l'opposé des NFT, des "stablecoins" ou de l'émission de jetons BRC-20, des contrats intelligents de la finance décentralisée, ces évolutions facilitent également la réalisation des couches L2 sensées effectuer des micro-transactions quasi instantanées pour des frais réduits, ce dont la couche L1 est incapable avec 7 transactions par seconde. A bien y réfléchir : les sommes importantes n'ont nullement besoin d'être déplacées à la vitesse de la lumière, donc Bitcoin L1 convient parfaitement offrant une sécurité optimale. Les petits montants n'ont pas ce besoin de sécurité poussée donc les L2 sont tout à fait adaptées pour de nombreuses transactions quasi-instantanées. Cela permet de couvrir un large spectre d'utilisation sans dénaturer le concept initial de Bitcoin et c'est tant mieux !
 
-***Retour à l'essentiel et conclusion pour le long cours***, ***le standard qui se dégage est SegWit native****. Legacy est "vieillissant" mais toujours bien supporté* !
+**Retour à l'essentiel et conclusion pour le long cours, le standard qui se dégage est SegWit native.**
+
+*Legacy est "vieillissant" mais toujours bien supporté !*
 
 *Ceci étant faites vos propres recherches et choisissez en connaissance de cause.*
 
@@ -1760,7 +1765,7 @@ Cette séparation des rôles est fondamentale pour la sécurité : même si votr
 
 1. L'achat s'effectue directement chez le fabricant, jamais de tiers entre vous et le concepteur.
 2. A réception, toujours inspecter l'emballage qui doit être scellé à un ou plusieurs niveaux.
-3. Avec l'application officielle du fabricant, vérifiez l'authenticité du dispositif et installez vous-même le firmware original du wallet. Notez la date, les références exactes du matériel, la version du firmware, la version de l'app Bitcoin si installée.
+3. Avec l'outil officiel du fabricant, vérifiez l'authenticité du dispositif et installez vous-même le firmware original du wallet. Notez la date, les références exactes du matériel, la version du firmware, la version de l'app Bitcoin pour Ledger.
 4. Seulement deux supports doivent reporter les mots de votre seed phrase : l'écran de votre portefeuille matériel qui listera les mots une seule et unique fois (⁵) lors de la création du wallet et le support physique où seront inscrit les mots de votre main. Si vous restaurez une seed, les mots clés devront être saisis uniquement sur le portefeuille matériel.
 5. Après avoir crée votre portefeuille et avant de l'utiliser toujours tester votre sauvegarde en ré-initialisant le device et en ressaisissant les mots sur le portefeuille matériel lui même. La première adresse publique du portefeuille doit être intégralement identique.
 6. Si votre cold wallet est fonctionnel mais que la seed phrase est perdue (⁵) ou compromise, créez un nouveau portefeuille avec une nouvelle seed phrase puis transférez les fonds de l'ancien vers le nouveau portefeuille.
@@ -1770,28 +1775,30 @@ Cette séparation des rôles est fondamentale pour la sécurité : même si votr
 | Critère | Trezor Safe 3 Bitcoin-only edition | Ledger Nano S Plus | BitBox02 Bitcoin-only edition | **Tangem** |
 |:---|----|----|----|----|
 | **Format** | Clé usb | Clé usb | Clé usb | Carte de crédit ou anneau |
-| **Matériel et fabricant du secure element (¹)** | Open source sauf le secure element EAL6+ `Infineon Technologies` | Partiellement open source, et non open source pour le secure element EAL5+ `STMicroelectronics` ou EAL6+ `Infineon Technologies` suivant l'année de fabrication. | Qualifiable d'open source car le secure element `Microchip Technology` ne stocke pas les clés privées. | Propriétaire, Secure element EAL6+ `Samsung` |
-| **Vérification, installation du firmware et de l'app Bitcoin sur le dispositif - OS supportés** | Utilisation **obligatoire** de [Trezor Suite](https://trezor.io) (logiciel open source, supporte Tor) - Windows / macOS / Linux / Android / iOS (portefeuille en lecture seule) | Utilisation **obligatoire** (²) de [Ledger Live](https://www.ledger.com) (logiciel open source, ne supporte pas Tor) - Windows / macOS / Linux(³) / Android / iOS non compatible | Utilisation **obligatoire** de BitBoxApp (logiciel open source, supporte Tor) - Windows / macOS / Linux(⁴) / Android | Utilisation **obligatoire** de Tangem Crypto Wallet (ios / android) application mobile pour interaction avec la carte ou le ring par NFC. |
-| **Support d'un nœud personnel par la suite logicielle du fabricant** | Oui avec le format Electrum SPV en clair, SSL ou TOR. Supporte également Blockbook personnel. | Oui par une connexion RPC à Bitcoin dont le wallet doit être actif. Il est nécessaire d'installer Ledger SatStack, logiciel open-source qui est une passerelle entre Ledger Live et le nœud Bitcoin complet. | Oui avec le format Electrum SPV en clair, SSL ou TOR | Non |
-| **Création du wallet et initialisation du PIN** | Electrum, Rabby, BlueWallet ... ou Trezor Suite | Uniquement sur le dispositif. | BitBoxApp obligatoire | Tangem Crypto wallet |
-| **Phrase de récupération Single Seed BIP39** | Trezor Suite avec "anciennes sauvegardes" en 12 ou 24 mots mais capacité à restaurer en 18 mots. Avec Electrum 12, 18 ou 24 mots. | Création en 24 mots uniquement mais capacité à restaurer un portefeuille avec une phrase de récupération de 12, 18 ou 24 mots. | Création en 12 ou 24 mots avec capacité à restaurer un portefeuille avec une phrase de récupération de 12, 18 ou 24 mots. | Le fabricant privilégie un backup dans plusieurs exemplaires du dispositif sans phrase de récupération, il propose néanmoins 12 ou 24 mots. |
-| **Vérifier sur le dispositif la phrase de récupération** | Oui | Oui en installant au préalable sur le device l'app Recovery Check à partir de Ledger Live | Oui | Non testé |
-| **Re-visualiser la phrase de récupération sur le dispositif (⁵)** | Non | Non | Oui | Non testé |
+| **Matériel et fabricant du secure element (¹)** | Open source sauf le secure element EAL6+ `Infineon Technologies` | Partiellement open source, et non open source pour le secure element EAL5+ `STMicroelectronics` ou EAL6+ avec `Infineon Technologies` suivant l'année de fabrication. | Qualifiable d'open source car le secure element `Microchip Technology` ne stocke pas les clés privées. | Propriétaire, Secure element EAL6+ `Samsung`.       Le dispositif n'est pas prévu pour être mis à jour. |
+| **Livré avec firmware ?** | Non, bootloader mode. | Oui, firmware seulement. | En principe Oui. | Oui. |
+| **Application pour vérifier l'authenticité, puis installer ou mettre à jour le firmware sur le dispositif - OS supportés.** | [Trezor Suite](https://trezor.io) logiciel open source, supporte Tor - Windows / macOS / Linux / Android / iOS (portefeuille en lecture seule). | [Legder Live rebaptisé Ledger Wallet](https://www.ledger.com) (²) logiciel open source, ne supporte pas Tor - Windows / macOS / Linux (³) / Android / iOS non compatible.  | Utilisation de BitBoxApp logiciel open source, supporte Tor - Windows / macOS / Linux(⁴) / Android | Utilisation **obligatoire** de Tangem Crypto Wallet (ios / android) application mobile pour interaction avec la carte ou le ring par NFC. |
+| **Idem ci-dessus mais en ligne commande** | Oui via trezorctl | Non | Oui via script Python du dépôt firmware. | Non |
+| **Support d'un nœud personnel par la suite logicielle du fabricant** | Oui avec le format Electrum SPV en clair, SSL ou TOR. Supporte également un serveur Blockbook personnel. | Non | Oui avec le format Electrum SPV en clair, SSL ou TOR. | Non |
+| **Création du wallet et initialisation du PIN sans utiliser l'App du fabricant** | Oui, l'intégration avec Electrum est forte sauf le wipe code (utilisez trezorctl). Autres : Sparrow, Specter, Bitcoin Core, etc … | Oui, tout est effectué sur le dispositif lui-même si l'app Bitcoin est installée dans le dispositif. Idem Trezor pour la liste. | Bien qu'il existe une alternative pour développeur, BitBoxApp est quasi obligatoire. | Tangem Crypto wallet |
+| **Single Seed BIP39 : Création / Restauration** | Avec Electrum 12, 18 ou 24 mots. Avec Trezor Suite et "anciennes sauvegardes" en 12 ou 24 mots / capacité à restaurer en 18 mots. | Création en 24 mots uniquement / capacité à restaurer un portefeuille avec une phrase de récupération de 12, 18 ou 24 mots. | Avec BitBoxApp création en 12 ou 24 mots / capacité à restaurer un portefeuille avec une phrase de récupération de 12, 18 ou 24 mots. | Le fabricant privilégie un backup dans plusieurs exemplaires du dispositif sans phrase de récupération, il propose néanmoins 12 ou 24 mots. |
+| **Vérifier sur le dispositif la phrase de récupération** | Oui | Oui en installant au préalable sur le device l'app Recovery Check à partir de l'App Ledger | Oui | Non testé |
+| **Re-visualiser la phrase de récupération sur le dispositif** | Non | Non | Oui (⁵) | Non testé |
 | **Option portefeuille caché et protégé par une passphrase** | Oui | Oui | Oui | Non |
-| **Phrase de récupération autre** | Oui (⁶) | Non | Non | Non |
+| **Seed phrase autre que BIP39** | Oui (⁶) | Non | Non | Non |
 | **"Pay to" par défaut** | SegWit | SegWit | SegWit | SegWit |
 | **Autres "Pay to" supportés par la suite logicielle du fabricant** | Legacy / P2SH-SegWit / Taproot | Legacy / P2SH-SegWit / Taproot | P2SH-SegWit / Taproot (⁷) | Legacy |
 | **Wallets tiers supportés** | Electrum, Sparrow, Specter … | Electrum, Sparrow, Specter … | Electrum, Sparrow, Specter … | Aucun |
-| **Wallets mobiles supportés (système)** | Trezor Suite Lite (Android) ou version Web de Trezor Suite par WebUSB - Mycelium (iOS / Android) | Ledger Live (Android) | BitBoxApp avec les mêmes fonctionnalités que la version desktop (Android) | Tangem Crypto Wallet (iOS / Android) |
+| **Wallets mobiles supportés - système** | Trezor Suite -Android ou version Web de Trezor Suite par WebUSB - Mycelium sur iOS / Android | Ledger Wallet - Android mais pas iOS car Bluetooth requis. | BitBoxApp avec les mêmes fonctionnalités que la version desktop (Android) | Tangem Crypto Wallet (iOS / Android) |
 | **Autres fonctionnalités** | Personnalisation écran d'accueil avec image n/b 128x64 pixels | Possibilité de créer un deuxième code PIN lié au portefeuille caché et protégé par une passphrase | Sauvegarde de la seed phrase et des notes de transactions sur microSD. Brouillage du signal usb entre le dispositif et l'appareil auquel il est raccordé. | Non testé |
-| **Réinitialisation au paramètres d'usine (effacement de toutes les données utilisateur)** | par Trezor Suite ou sur le dispositif après saisie de 16 PIN erronés ou par saisie d'un PIN dédié (wipe code) à la place du PIN de déverrouillage. | Réinitialisation aux paramètres d'usine (⁸) par le Control Center de Ledger Live, sur le dispositif par appui long des 2 boutons (settings) ou après la saisie de 3 PIN erronés. | Réinitialisation aux paramètres d'usine avec BitBoxApp ou après la saisie sur le dispositif de 10 PIN erronés | Uniquement avec Tangem Crypto Wallet |
+| **Réinitialisation au paramètres d'usine (effacement de toutes les données utilisateur)** | par Trezor Suite ou sur le dispositif après saisie de 16 PIN erronés ou par saisie d'un PIN dédié (wipe code) à la place du PIN de déverrouillage. | Réinitialisation aux paramètres d'usine (⁸) par le Control Center de l'App Ledger, sur le dispositif par appui long des 2 boutons (settings) ou après la saisie de 3 PIN erronés. | Réinitialisation aux paramètres d'usine avec BitBoxApp ou après la saisie sur le dispositif de 10 PIN erronés | Uniquement avec Tangem Crypto Wallet |
 | **Multi-portefeuille** | Oui (⁹) | Oui (⁹) | Oui (⁹) | Oui (⁹) |
 | **Entreprise - Pays d'origine** | [SatoshiLabs](https://trezor.io) - République tchèque | [Ledger SAS](https://www.ledger.com) - France | **[Shift Crypto](https://bitbox.swiss/) -** Suisse | [Tangem AG](https://tangem.com) -Suisse |
 | **Achat du dispositif** | Fiat ou Bitcoin | Fiat | Fiat ou Bitcoin | Fiat ou Bitcoin |
 
 (¹) à l'heure actuelle il n'existe pas de "secure element" open source, en principe c'est dans cette puce sécurisée que les clés privées sont stockées.
 
-(²) Pas tout à fait, il existe une alternative avec [Bacca](https://github.com/darosior/ledger_installer).
+(²) Ledger a la particularité de gérer chaque asset avec une app différente qu'il faut implicitement installer dans le wallet. Ce n'est pas le cas des autres fabricants qui intègrent la gestion de l'asset dans le firmware.
 
 (³) Après avoir déverrouillé le dispositif et lancé l'app Bitcoin, sous Linux il sera parfois nécessaire de fixer les règles UDEV par : `wget -q -O - https://raw.githubusercontent.com/LedgerHQ/udev-rules/master/add_udev_rules.sh | sudo bash` (comme indiqué sur le portail Ledger)
 
@@ -1802,18 +1809,71 @@ Cette séparation des rôles est fondamentale pour la sécurité : même si votr
 * avantage, si la seed phrase est perdue il est possible de la ré-écrire sur un support physique ou de la sauvegarder à nouveau sur micro SD.
 * inconvénient, si une personne mal intentionnée à accès au dispositif et qu'elle connait le code PIN, en dehors du vol direct comme sur tous les autres dispositifs il faut considérer l'effet pervers du temps que cela peut engendrer. En effet cette personne sera en mesure de créer son backup personnel et de déplacer les fonds plus tard …
 
-(⁶) Autres phrases de récupération sur Trezor wallet :
+(⁶) Autres phrases de récupération avec Trezor :
 
 * Trezor Suite propose SLIP39 Shamir en 20 mots uniquement, avec Single-Share Backup (1 seul fragment) ou du Multi-Share Backup (2 à 16 fragments), il est possible de produire le Backup Multi-Share avec Single-Share. Les deux seront valables, à l'utilisateur de détruire ensuite le Single-Backup.
-* Electrum est capable de gérer un portefeuille avec un dispositif initialisé (vérification, installation du firmware et du micrologiciel Bitcoin avec Trezor Suite car à la livraison le matériel est en "bootloader mode"). Il peut initier la procédure pour nommer l'appareil et activer son code Pin. En plus de BIP39 et avec "Show expert settings" Electrum propose la seed SLIP39 Shamir ou Super Shamir avec 20 ou 33 mots. Si vous êtes vraiment un expert, est proposé en plus : avec la passphrase (hidden wallet) ou le Seedless Mode (master seed sans backup). Une fois le portefeuille ouvert dans Electrum vous aurez accès à presque toutes les fonctionnalités fournies par le dispositif en cliquant sur l'icône dans le coin inférieur droit d'Electrum.
+* Electrum est capable de gérer le Trezor avec un dispositif initialisé (vérification, installation du firmware). Il peut initier la procédure pour nommer l'appareil et activer son code Pin. En plus de BIP39 et avec "Show expert settings" Electrum propose la seed SLIP39 Shamir ou Super Shamir avec 20 ou 33 mots. Si vous êtes vraiment un expert, est proposé en plus : avec la passphrase (hidden wallet) ou le Seedless Mode (master seed sans backup). Une fois le portefeuille ouvert dans Electrum vous aurez accès à presque toutes les fonctionnalités fournies par le dispositif en cliquant sur l'icône dans le coin inférieur droit d'Electrum.
 
 (⁷) Les autres "Pay to" sont supportés avec un portefeuille tiers tels que Sparrow ou Electrum.
 
-(⁸) Effacement du Ledger Nano S+ : la ré-initialisation efface tout sauf le firmware, il est ensuite nécessaire de ré-installer l'app Bitcoin avec Ledger Live.
+(⁸) Effacement du Ledger Nano S+ : la ré-initialisation efface tout sauf le firmware, il est ensuite nécessaire de ré-installer l'app Bitcoin avec l'App Ledger.
 
 (⁹) En utilisant des chemins de dérivation ou des `Pay To` différents, il est possible de créer de multiples portefeuilles avec la même graine maîtresse (master seed), donc la même liste de mots. Attention il est préférable de noter les choix effectués puisque cela complexifie la gestion et la récupération en cas de problèmes.
 
-*Sauf pour Tangem, il est possible de restreindre l'usage des suites logicielles fournies par les fabricants à la vérification, la mise à jour du firmware et à l'installation du micro logiciel. Avec Trezor Safe 3 ou Ledger Nano S Plus vous n'avez pas besoin de créer de compte (création du portefeuille et génération des adresses) dans la suite logicielle. BitBox02 nécessite l'utilisation de BitboxApp pour restaurer ou créer le portefeuille en générant la phrase de récupération, ensuite il est possible d'utiliser le dispositif avec le portefeuille logiciel de votre choix pourvu qu'il soit compatible.*
+*Sauf pour Tangem, il est possible de restreindre l'usage des suites logicielles fournies par les fabricants, à la vérification, à la mise à jour du firmware, et à l'installation du micro logiciel Bitcoin pour Ledger. Selon les fabricants ces suites sont parfois de véritables "BloatWares" !*
+
+*Avec Trezor Safe 3 ou Ledger Nano S Plus vous n'avez pas besoin de créer de compte (génération de la seed phrase) dans la suite logicielle. Cette étape n'est pas aisée à contourner pour BitBox02, mais notez qu'une fois que c'est effectué soit par création ou restauration il est ensuite possible d'utiliser ce dispositif avec le portefeuille logiciel de votre choix pourvu qu'il soit compatible.*
+
+Le Trezor Safe 3 est le seul qui, assez facilement, peut entièrement se passer de la suite logicielle du fabricant. Ci-dessous une méthode.
+
+```none
+# Commencer par installer pipx
+
+# Pour Debian/Ubuntu
+sudo apt-get install pipx
+pipx ensurepath             # ajoute ~/.local/bin au PATH (rouvrir le terminal)
+
+ou
+
+# Pour une Arch-based comme CachyOS
+sudo pacman -Syu python-pipx
+mkdir ~/.local/bin
+fish_add_path ~/.local/bin  # ajoute ~/.local/bin au PATH
+```
+
+Installer le paquet officiel de SatoshiLabs, puis installer le firmware sur le Trezor Safe 3 neuf
+
+```none
+pipx install trezor    # Installe le paquet trezor depuis PyPi le dépôt officiel des paquets Python
+
+# Un Trezor neuf EST en bootloader, branchez le, l'écran doit afficher bootloader
+trezorctl get-features      # Vous devez voir bootloader_mode: True et firmware_present: False
+
+trezorctl firmware update --bitcoin-only  # firmware Bitcoin uniquement (surface d'attaque réduite)
+ou
+trezorctl firmware update                 # firmware global
+
+# trezorctl télécharge le firmware officiel et affiche son empreinte.
+# Le Trezor affiche la même empreinte : vérifiez qu'elles correspondent, puis confirmez sur l'appareil.
+# L'appareil redémarre tout seul à la fin.
+
+Lancez Electrum par exemple et créez votre seed phrase avec votre Trezor !
+```
+
+Du temps s'est écoulé, vous avez décidé de mettre à jour votre Trezor
+
+```none
+trezorctl version           # Voir la version
+pipx upgrade trezor         # Mise à jour du package Trezor
+
+# Branchez le Trezor (initialisé précédement) sur un port USB puis dévérouillez le
+trezorctl list                             # le Trezor doit apparaître
+trezorctl device authenticate              # Suivez les instructions sur le device pour authentification
+trezorctl get-features                     # modèle, version du firmware, état, etc ...
+trezorctl firmware update --bitcoin-only   # variante Bitcoin-only, sinon update tout court
+trezorctl set wipe-code                    # définir le wipe code
+trezorctl --help
+```
 
 # Annexes
 
@@ -1845,7 +1905,7 @@ Début 2026 j'avais choisi le code de v29.3.knots20260507 puis en juin 2026 j'ai
   * Conséquence : mettre à jour par `git pull` puis prendre la dernière version de Knots construit aujourd'hui un nœud d'une autre chaîne. Si vous avez un nœud Knots, contrôlez sa version par `bitcoin-cli -version` et comparez le résultat de `bitcoin-cli getbestblockhash` avec un explorateur indépendant ([mempool.space](https://mempool.space/) par exemple).
 
 
-- [ ] Octobre 2026**,** j'ai le choix entre deux versions de Bitcoin Core :
+- [ ] Octobre 2026, j'ai le choix entre deux versions de Bitcoin Core :
 
 * v31.1 pour la dernière final, avec de multiples OP_RETURN mais limitables en taille avec `datacarriersize`.
 * v29.4 pour l'avant, avant dernière final, par défaut un seul OP_RETURN limité à 83 octets de script, soit 80 octets de données utiles par transaction.
@@ -2112,7 +2172,7 @@ Ainsi, il n'est pas considéré comme sûr d'utiliser des versions de Bitcoin Co
 
 Un aspect fondamental du modèle de sécurité de Bitcoin est que le logiciel du nœud n'est PAS mis à jour automatiquement. Les mises à jour automatiques créeraient un point de défaillance unique qui pourrait permettre à une mise à jour malveillante de se propager rapidement à une super-majorité de nœuds sur le réseau.
 
-Bon, tout cela est de la belle littérature, en définitive le choix vous appartient, le joyeux bazar est aussi un modèle de sécurité.
+Bon, tout cela est de la belle littérature, en définitive le choix vous appartient. Le joyeux bazar est aussi un modèle de sécurité pour le réseau bitcoin, et en principe il l'est moins pour vous.
 
 ```bash
 # Se positionner dans le répertoire du code source de bitcoin
