@@ -30,7 +30,7 @@ Dans les détails
 
 ## Machine minimale
 
-Raspberry Pi 5
+Testé → Raspberry Pi 5
 
 * cpu Arm Cortex-A76 / 4 Cores / 2.4 GHz / TDP 12 W (gravure 16 nm)
 * 8 Gio de Ram / LPDDR4X 4267 MHz
@@ -51,7 +51,7 @@ Raspberry Pi 5
 
 ## Machine classique
 
-Dell Optiplex 5050 SFF
+Testé → Dell Optiplex 5050 SFF
 
 * cpu intel i3-6100 / 2 Cores / 4 Threads / 3.70 GHz / TDP 51W (gravure 14 nm)
 * 8 Gio de Ram / DDR4 2133 MHz
@@ -126,7 +126,7 @@ Data Units Written:                 44 888 895 [22,9 TB]
 Power On Hours:                     14 044
 ```
 
-14 044 heures soit 585 jours ON avec 23 TB d'écriture. Donc environ 0,04 TB par jour.  Si le TBW (Tera Bytes Write) annoncé par le constructeur est de 110, mon NVMe sera cuit en 2750 jours soit 7,5 ans d'usage. Le TBW du matériel est primordial pour apprécier la durabilité, les chiffres annoncés par les fabricants varient dans de grandes proportions (bas de gamme ≈ 100 et haut de gamme > 1000). À matériel équivalent, plus le NVMe est de grande capacité et plus le TBW sera grand.
+14 044 heures soit 585 jours ON avec 23 TB d'écriture. Donc environ 0,04 TB par jour.  Avec un TBW (Tera Bytes Write) annoncé par le constructeur à 110, mon NVMe sera cuit en 2750 jours soit 7,5 ans d'usage. Le TBW est primordial pour apprécier la durabilité de ces stockages de masse. Les chiffres annoncés par les fabricants varient dans de grandes proportions (bas de gamme ≈ 100 et haut de gamme > 1000). À matériel équivalent, plus le NVMe est de grande capacité et plus le TBW sera grand.
 
 ## Performance mémoire vive
 
@@ -627,7 +627,7 @@ par=0
 assumevalid=0
 
 # Elague la blockchain au fur et a mesure afin de reduire la place occupee.
-# Vous perdez les transactions les plus anciennes afin de limiter ici à 550 Mo
+# Vous perdez les transactions les plus anciennes afin de limiter ici à 550 Mio
 # de fichiers de blocs 'blocks' auxquels il faut ajouter le 'chainstate' avec un peu plus
 # de 10 Gio, soit un total d'environ 15 Gio.
 # Apres activation il n'est pas possible de revenir en arriere, il faudra
@@ -640,13 +640,13 @@ assumevalid=0
 # memoire disponible. Par exemple, avec 8 Gio de memoire, quelque chose comme
 # 'dbcache= 4000' fait sens.
 # Contrepartie : l'arret du noeud prend plus de temps, car tout le cache est ecrit sur
-# le disque. Apres un crash, il faut recalculer plus de données au redemarrage.
+# le disque. Apres un crash, il faut recalculer plus de donnees au redemarrage.
 # Pour une utilisation reduite de la memoire, ce parametre peut etre diminue, voire
 # supprime une fois que la synchronisation initiale (IBD) est terminee.
 dbcache=4000
 
-# Plafond en Mo de la mempool en RAM. Default is 300.
-# Avant de modifier le default, verifiez la memoire vive disponible avec "free -mh"
+# Plafond en Mo (oui c'est bien en Mo !) de la mempool en RAM. Default is 300.
+# Avant de modifier le defaut, verifiez la memoire vive disponible avec "free -mh"
 # A 800 le noeud garde plus de transactions en attente quand le reseau est
 # congestionne. Moins de transactions a frais bas sont supprimees.
 # L'estimation des frais sera meilleure et si des applications comme mempool.space
@@ -1779,8 +1779,8 @@ Cette séparation des rôles est fondamentale pour la sécurité : même si votr
 | **Format** | Clé usb | Clé usb | Clé usb | Carte de crédit ou anneau |
 | **Matériel et fabricant du secure element (¹)** | Open source sauf le secure element EAL6+ `Infineon Technologies` | Partiellement open source, et non open source pour le secure element EAL5+ `STMicroelectronics` ou EAL6+ avec `Infineon Technologies` suivant l'année de fabrication. | Qualifiable d'open source car le secure element `Microchip Technology` ne stocke pas les clés privées. | Propriétaire, Secure element EAL6+ `Samsung`.       Le dispositif n'est pas prévu pour être mis à jour. |
 | **Livré avec firmware ?** | Non, bootloader mode. | Oui, firmware seulement. | En principe oui. | Oui. |
-| **Application pour vérifier l'authenticité, puis installer ou mettre à jour le firmware sur le dispositif - OS supportés.** | [Trezor Suite](https://trezor.io) logiciel open source, supporte Tor - Windows / macOS / Linux / Android / iOS (portefeuille en lecture seule). | [Ledger Live rebaptisé Ledger Wallet](https://www.ledger.com) (²) logiciel open source, ne supporte pas Tor - Windows / macOS / Linux (³) / Android / iOS non compatible. | Utilisation de BitBoxApp logiciel open source, supporte Tor - Windows / macOS / Linux(⁴) / Android | Utilisation **obligatoire** de Tangem Crypto Wallet (ios / android) application mobile pour interaction avec la carte ou le ring par NFC. |
-| **Idem ci-dessus mais en ligne de commande** | Oui via trezorctl | Non | Oui via script Python du dépôt firmware. | Non |
+| **Application pour vérifier l'authenticité, puis installer ou mettre à jour le firmware sur le dispositif - OS supportés.** | [Trezor Suite](https://trezor.io) logiciel open source, supporte Tor - Windows / macOS / Linux / Android / iOS (portefeuille en lecture seule). | Utilisation **obligatoire** de [Ledger Live rebaptisé Ledger Wallet](https://www.ledger.com) (²) logiciel open source, ne supporte pas Tor - Windows / macOS / Linux (³) / Android / iOS non compatible. | [BitBoxApp](https://bitbox.swiss/) logiciel open source, supporte Tor - Windows / macOS / Linux(⁴) / Android | Utilisation **obligatoire** de [Tangem Crypto Wallet](https://tangem.com/) (ios / android) application mobile pour interaction avec la carte ou le ring par NFC. |
+| **Idem ci-dessus mais en ligne de commande** | Oui via `trezorctl` | Non | Oui via script Python du dépôt firmware. | Non |
 | **Support d'un nœud personnel par la suite logicielle du fabricant** | Oui avec le format Electrum SPV en clair, SSL ou TOR. Supporte également un serveur Blockbook personnel. | Non | Oui avec le format Electrum SPV en clair, SSL ou TOR. | Non |
 | **Création du wallet et initialisation du PIN sans utiliser l'App du fabricant** | Oui, l'intégration avec Electrum est forte sauf le wipe code (utilisez trezorctl). Autres : Sparrow, Specter, Bitcoin Core, etc. | Oui, tout est effectué sur le dispositif lui-même si l'app Bitcoin est installée dans le dispositif. Idem Trezor pour la liste. | Bien qu'il existe une alternative pour développeur, BitBoxApp est quasi obligatoire. | Tangem Crypto wallet |
 | **Single Seed BIP39 : Création / Restauration** | Avec Electrum 12, 18 ou 24 mots. Avec Trezor Suite et "anciennes sauvegardes" en 12 ou 24 mots / capacité à restaurer en 18 mots. | Création en 24 mots uniquement / capacité à restaurer un portefeuille avec une phrase de récupération de 12, 18 ou 24 mots. | Avec BitBoxApp création en 12 ou 24 mots / capacité à restaurer un portefeuille avec une phrase de récupération de 12, 18 ou 24 mots. | Le fabricant privilégie un backup dans plusieurs exemplaires du dispositif sans phrase de récupération, il propose néanmoins 12 ou 24 mots. |
@@ -1822,14 +1822,14 @@ Cette séparation des rôles est fondamentale pour la sécurité : même si votr
 
 (⁹) En utilisant des chemins de dérivation ou des `Pay To` différents, il est possible de créer de multiples portefeuilles avec la même graine maîtresse (master seed), donc la même liste de mots. Attention il est préférable de noter les choix effectués puisque cela complexifie la gestion et la récupération en cas de problèmes.
 
-*Sauf pour Tangem, il est possible de restreindre l'usage des suites logicielles fournies par les fabricants, à la vérification, à la mise à jour du firmware ou à l'installation (Trezor), et à l'installation du micrologiciel Bitcoin pour Ledger. Selon les fabricants ces suites sont parfois de véritables "BloatWares" !*
+*Sauf pour Tangem, il est possible de restreindre l'usage des suites logicielles fournies par les fabricants, à la mise à jour ou à l'installation du firmware, à la vérification, et à l'installation du micrologiciel Bitcoin pour Ledger. Selon les fabricants ces suites sont parfois de véritables "BloatWares" !*
 
 *Avec Trezor Safe 3 ou Ledger Nano S Plus vous n'avez pas besoin de créer de compte (génération de la seed phrase) dans la suite logicielle. Cette étape n'est pas aisée à contourner pour BitBox02, mais notez qu'une fois que c'est effectué soit par création ou restauration il est ensuite possible d'utiliser ce dispositif avec le portefeuille logiciel de votre choix pourvu qu'il soit compatible.*
 
 Le Trezor Safe 3 est le seul qui, assez facilement, peut entièrement se passer de la suite logicielle du fabricant. C'est avec `trezorctl`, ci-dessous une méthode d'installation sous Linux.
 
 ```none
-# Commencer par installer pipx (environnement isolé, créé exprès pour paquet Trezor)
+# Commencer par installer pipx (environnement isolé, créé exprès pour le paquet Trezor)
 
 # Pour Debian/Ubuntu
 sudo apt-get install pipx
@@ -1927,7 +1927,7 @@ Dans l'univers Bitcoin, « Code is law » veut dire que les règles du réseau n
 
 ## Copie directe de la blockchain
 
-Si vous avez un accès physique à un autre nœud de confiance vous pouvez copier sa blockchain au lieu de la télécharger des pairs. Normalement située dans `/home/bitcoin_user/.bitcoin`, copiez récursivement les répertoires `blocks` et `chainstate` (`indexes` est facultatif car le nœud les reconstruira à partir de ce que vous avez paramétré dans `bitcoin.conf`). Le préalable est bien sûr de stopper `bitcoind` le temps de la sauvegarde (ou si btrfs sans arrêter le daemon avec un snapshot).
+Si vous avez un accès physique à un autre nœud de confiance vous pouvez copier sa blockchain au lieu de la télécharger des pairs. Normalement située dans `/home/bitcoin_user/.bitcoin`, copiez récursivement les répertoires `blocks` et `chainstate` (`indexes` est facultatif car le nœud les reconstruira à partir de ce que vous avez paramétré dans `bitcoin.conf`). Le préalable est bien sûr de stopper `bitcoind` le temps de la sauvegarde (ou, si btrfs, à partir d'un snapshot : il est souhaitable d'arrêter `bitcoind` le temps de le créer, la copie se fait ensuite sans arrêt, voir l'annexe Snapshot des données).
 
 Copier 700 Gio de données sur un support externe n'est pas anodin, par un port usb 3.0 j'ai eu deux expériences : une de 5h avec un débit de 38 Mo/s sur je sais plus quoi et une autre de 30 minutes avec un débit de 385 Mo/s sur un bon adaptateur usb 3 pour NVMe.
 
@@ -2072,7 +2072,14 @@ Pour aller plus loin vous trouverez sur le net tout ce qu'il faut pour créer un
 
 ## Snapshot des données
 
-Si les données blockchain sont hébergées sur un stockage de masse formaté BTRFS, effectuer un snapshot peut s'avérer utile avant une mise à jour de `bitcoind`. Un snapshot read-only permet de sauvegarder l'état de la blockchain avant chaque mise à jour et d'effectuer un rollback si nécessaire. Il est possible de faire pas mal de choses avec les snapshots, comme copier la blockchain jusqu'à la date du snapshot sur un autre support de stockage sans arrêter le daemon `bitcoind` ; ou encore utiliser la copie blockchain de votre nœud avec un snapshot writable destiné à faire tourner un autre nœud par exemple en mode graphique sur votre PC. (montage dans le filesystem de votre PC avec SSHFS (SSH File System) `sshfs utilisateur@hote_distant:/chemin/distant ~/remote_mount`)
+Si les données blockchain sont hébergées sur un stockage de masse formaté BTRFS, effectuer un snapshot peut s'avérer utile avant une mise à jour de `bitcoind`. Un snapshot read-only permet de sauvegarder l'état de la blockchain avant chaque mise à jour et d'effectuer un rollback si nécessaire. Il est possible de faire pas mal de choses avec les snapshots, comme copier la blockchain jusqu'à la date du snapshot sur un autre support de stockage sans arrêter le daemon `bitcoind`.
+
+Ce que contient le snapshot de `@bitcoin` : tout le répertoire `~/.bitcoin`, donc la blockchain et les index, mais aussi `bitcoin.conf`, les wallets éventuels et les clés Tor / I2P (`onion_v3_private_key`, `i2p_private_key`). Ce qu'il ne contient pas : les binaires installés dans `/usr/local/bin`, qui sont sur le disque de l'OS.
+
+Deux limites à garder en tête :
+
+* Un snapshot est stocké sur le même NVMe que l'original : il protège d'une erreur de manipulation ou d'une mise à jour ratée, pas d'une panne du disque. Seule une copie avec `btrfs send` vers un autre support le fait.
+* Un snapshot ne coûte presque rien au départ, puis grossit à mesure que l'original change. `chainstate` est réécrit en permanence et, après un `-reindex`, un ancien snapshot peut retenir l'équivalent de toute la blockchain. Effacez les snapshots devenus inutiles.
 
 Voici quelques commandes et cas d'usage :
 
@@ -2083,53 +2090,109 @@ sudo btrfs filesystem usage /mnt/btrfs/bitcoin
 # Lister les subvolumes et les snapshots
 sudo btrfs subvolume list -t /mnt/btrfs/bitcoin
 
-# Creer un READ-ONLY snapshot de la blockchain Bitcoin (subvolume snapshots deja existant)
+# Taille occupee par chaque snapshot. La colonne Exclusive est la place
+# liberee si on l'efface (parfois long : parcourt toutes les donnees)
+sudo btrfs filesystem du -s /mnt/btrfs/snapshots/*
+
+# Creer un READ-ONLY snapshot de la blockchain Bitcoin et de l'index Electrs
+# (subvolume snapshots deja existant)
+# Il est souhaitable de stopper les services avant, le snapshot est alors propre.
+# Pris a chaud il reste exploitable : au demarrage bitcoind se comporte comme
+# apres une coupure de courant et rejoue les derniers blocs.
+sudo systemctl stop electrs.service   # Stoppez electrs (si installe)
 sudo systemctl stop bitcoin.service   # Stoppez le demon bitcoind
-# Attendre obligatoirement l'invite !
-# afin que bitcoind flush (parfois plusieurs Go) du cache UTXO en RAM vers le disque
-sudo btrfs subvolume snapshot -r /mnt/btrfs/bitcoin /mnt/btrfs/snapshots/bitcoin_2025-12-14_RO
-sudo systemctl start bitcoin.service   # Demarrer le demon bitcoind
+# Attendre le retour de l'invite : bitcoind ecrit (parfois plusieurs Go)
+# le cache UTXO de la RAM vers le disque
+DATE=$(date +%F_%H%M)                 # ex. 2026-10-13_2130
+sudo btrfs subvolume snapshot -r /mnt/btrfs/bitcoin /mnt/btrfs/snapshots/bitcoin_${DATE}_RO
+sudo btrfs subvolume snapshot -r /mnt/btrfs/electrs /mnt/btrfs/snapshots/electrs_${DATE}_RO
+sudo systemctl start bitcoin.service  # Demarrer le demon bitcoind
+sudo systemctl start electrs.service  # Demarrer electrs
 
-# Voir le contenu du snapshot
-ls -lh /mnt/btrfs/snapshots/bitcoin_2025-12-14_RO
+# Voir les snapshots et le contenu de l'un d'eux
+ls -lh /mnt/btrfs/snapshots/
+ls -lh /mnt/btrfs/snapshots/bitcoin_AAAA-MM-JJ_HHMM_RO
 
-# Copier un snapshot, c'est copier les données de l'image figee d'un sous-volume
+# Copier un snapshot, c'est copier les donnees de l'image figee d'un sous-volume
 # a une date donnee sur un autre support de masse au format BTRFS
-# par exemple une clef USB montee dans le systeme de fichier, ici en /mnt/usb
-# Pas besoin de stopper bitcoind vu que c'est un snapshot
-sudo btrfs send /mnt/btrfs/snapshots/nom-du_snapshot_date | sudo btrfs receive /mnt/usb
+# par exemple un disque USB monte dans le systeme de fichiers, ici en /mnt/usb
+# Pas besoin de stopper bitcoind vu que c'est un snapshot read-only
+# Place necessaire : au moins ce qu'occupe le sous-volume, voir
+sudo btrfs filesystem du -s /mnt/btrfs/bitcoin
+# --compressed-data envoie les donnees deja compressees (zstd) sans les decompresser
+sudo btrfs send --compressed-data /mnt/btrfs/snapshots/bitcoin_AAAA-MM-JJ_HHMM_RO | sudo btrfs receive /mnt/usb
 
-# Afficher l'espace libre / utilise sur la clef usb
+# Copies suivantes : seules les differences avec un snapshot precedent,
+# deja present des deux cotes, sont transferees (-p comme parent)
+sudo btrfs send --compressed-data -p /mnt/btrfs/snapshots/bitcoin_ANCIEN_RO \
+     /mnt/btrfs/snapshots/bitcoin_NOUVEAU_RO | sudo btrfs receive /mnt/usb
+
+# Afficher l'espace libre / utilise sur le disque usb
 sudo btrfs filesystem usage /mnt/usb
 
-# Effacer un snapshot
-sudo btrfs subvolume delete /mnt/btrfs/snapshots/nom-du-snapshot
+# Effacer un snapshot devenu inutile
+sudo btrfs subvolume delete /mnt/btrfs/snapshots/bitcoin_AAAA-MM-JJ_HHMM_RO
 ```
 
 À partir d'un snapshot **read-only** revenir à un état précédent (rollback)
 
 ```bash
-# /!\ ATTENTION /!\ c'est destructif pour les changements post-snapshot
-# Ne pas oublier le wallet du noeud s'il est utilisé
+# /!\ ATTENTION /!\ tout ce qui a change dans @bitcoin apres le snapshot est perdu :
+# blocs et index, mais aussi bitcoin.conf, les wallets et les cles Tor / I2P.
+# Les binaires (/usr/local/bin) ne sont pas dans le snapshot : si la mise a jour
+# de bitcoind est en cause, reinstaller aussi l'ancienne version (voir maj de bitcoind).
 
 # Arreter TOUS les services qui utilisent des sous-volumes btrfs
 sudo systemctl stop electrs.service            # Stoppez electrs
 sudo systemctl stop bitcoin.service            # Stoppez le demon bitcoind
-sudo btrfs subvolume list /mnt/btrfs/bitcoin   # Identifier le snapshot
+
+# Mettre de cote ce qui doit survivre au rollback
+mkdir -p ~/rollback_save
+cp -a ~/.bitcoin/bitcoin.conf ~/rollback_save/
+cp -a ~/.bitcoin/wallets ~/rollback_save/      # si le wallet du noeud est utilise
+
+# Identifier le snapshot a restaurer
+sudo btrfs subvolume list -t /mnt/btrfs/bitcoin
 
 # Demonter TOUS les sous-volumes
-sudo btrfs subvolume list -t /mnt/btrfs/bitcoin    # Liste d'abord tous les subvolumes
+# Si "target is busy" : sortir de ~/.bitcoin dans tous les terminaux,
+# 'sudo fuser -vm /mnt/btrfs/bitcoin' montre qui bloque
+cd ~
 sudo umount /mnt/btrfs/bitcoin
 sudo umount /mnt/btrfs/electrs
 sudo umount /mnt/btrfs/snapshots
 
-# Montez temporairement le volume RACINE btrfs sans l'option subvol
-sudo mkdir /mnt/btrfs_root                           # si pas deja cree
-sudo mount /dev/nvme0n1p1 /mnt/btrfs_root            # Pour moi c'est nvme0n1p1
-sudo btrfs subvolume delete /mnt/btrfs_root/@bitcoin # Efface ... puis remplace ci-dessous
-sudo btrfs subvolume snapshot /mnt/btrfs_root/@snapshots/bitcoin_2025-12-14_RO /mnt/btrfs_root/@bitcoin
+# Monter temporairement la RACINE btrfs (subvolid=5 = la racine, quel que soit
+# le sous-volume par defaut)
+sudo mkdir -p /mnt/btrfs_root                                # si pas deja cree
+sudo mount -o subvolid=5 /dev/nvme0n1p1 /mnt/btrfs_root      # Pour moi c'est nvme0n1p1
+
+# Renommer l'actuel au lieu de l'effacer : retour possible en cas d'erreur
+sudo mv /mnt/btrfs_root/@bitcoin /mnt/btrfs_root/@bitcoin_old
+# Recreer @bitcoin a partir du snapshot, sans -r donc writable
+sudo btrfs subvolume snapshot /mnt/btrfs_root/@snapshots/bitcoin_AAAA-MM-JJ_HHMM_RO /mnt/btrfs_root/@bitcoin
+
+# Idem pour Electrs, afin que son index ne soit pas en avance sur le noeud
+sudo mv /mnt/btrfs_root/@electrs /mnt/btrfs_root/@electrs_old
+sudo btrfs subvolume snapshot /mnt/btrfs_root/@snapshots/electrs_AAAA-MM-JJ_HHMM_RO /mnt/btrfs_root/@electrs
+
 sudo umount /mnt/btrfs_root    # Demonter
-sudo mount -a                  # Remonter les volumes listés dans fstab
+sudo mount -a                  # Remonter les volumes listes dans fstab
+# fstab monte par le nom (subvol=@bitcoin) : c'est bien le nouveau @bitcoin qui est monte
+
+# Remettre ce qui a ete mis de cote
+cp -a ~/rollback_save/bitcoin.conf ~/.bitcoin/
+cp -a ~/rollback_save/wallets ~/.bitcoin/      # si le wallet du noeud est utilise
+
+# Redemarrer et verifier
+sudo systemctl start bitcoin.service
+tail -f ~/.bitcoin/debug.log                   # Ctrl+C pour quitter
+sudo systemctl start electrs.service
+
+# Quand tout fonctionne, liberer la place des anciens sous-volumes
+sudo mount -o subvolid=5 /dev/nvme0n1p1 /mnt/btrfs_root
+sudo btrfs subvolume delete /mnt/btrfs_root/@bitcoin_old /mnt/btrfs_root/@electrs_old
+sudo umount /mnt/btrfs_root
 ```
 
 # Les mises à jour
@@ -2163,7 +2226,7 @@ Si nécessaire redémarrez le système par `sudo reboot`
 Avant de mettre à jour :
 
 * Si vous avez utilisé le portefeuille de votre nœud, sauvegardez temporairement le répertoire contenant le ou les wallets.
-* Si la blockchain est écrite sur un système de fichiers btrfs effectuez un snapshot read-only avant de lancer la nouvelle version de `bitcoind`.
+* Si la blockchain est écrite sur un système de fichiers btrfs effectuez un snapshot read-only avant de lancer la nouvelle version de `bitcoind` (commandes ci-dessous, au moment où les services sont arrêtés).
 
 Ouvrir un terminal afin d'accéder au nœud puis afficher la version actuelle avec la commande `bitcoin-cli -version` . Ensuite consultez la page des releases sur le repository, il est utile de lire les notes de la nouvelle version vers laquelle vous mettez à jour (et celles des versions que vous avez sautées) s'il y a des fonctionnalités / options qui vous intéressent ou que vous allez devoir gérer. Il est bon de préciser que l'on va toujours de l'avant avec les versions. Si vous devez aller en arrière lisez impérativement les release notes. Ainsi si vous avez construit votre nœud avec Bitcoin Core v28.0 sans `blocksxor=0` dans `bitcoin.conf` puis téléchargé toute la blockchain n'installez pas une v27.x car elle ne saura pas lire la blockchain puisque le brouillage est venu avec la v28.0 !
 
@@ -2231,6 +2294,14 @@ sudo systemctl stop bitcoin.service
 
 # Pour bitcoin vous avez vu "Shutdown: done" dans les logs ? Poursuivez
 # sinon attendez parfois qq min
+
+# Si BTRFS : snapshot read-only maintenant, les services sont deja arretes
+DATE=$(date +%F_%H%M)
+sudo btrfs subvolume snapshot -r /mnt/btrfs/bitcoin /mnt/btrfs/snapshots/bitcoin_${DATE}_RO
+sudo btrfs subvolume snapshot -r /mnt/btrfs/electrs /mnt/btrfs/snapshots/electrs_${DATE}_RO
+
+# Sauvegarder temporairement les anciens binaires
+mkdir -p ~/bitcoin-bin-old && cp -a /usr/local/bin/bitcoin* ~/bitcoin-bin-old/
 
 # Se positionner dans le répertoire du code source de Bitcoin
 cd ~/code/bitcoin
