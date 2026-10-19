@@ -239,7 +239,7 @@ git verify-tag v31.1
 # L'avertissement "This key is not certified with a trusted signature" est normal.
 # "BAD signature" ou "No public key" : NE PAS compiler, chercher pourquoi.
 
-mkdir build                              # Creation du repertoire build
+mkdir build                              # Creation du repertoire build si besoin est
 # ou si reconstruction, supprimer tout ce qui est dans build
 # rm -rf ~/code/bitcoin/build/*
 
@@ -597,7 +597,7 @@ nano ~/.bitcoin/bitcoin.conf
 Copier / coller ceci dans le fichier `bitcoin.conf` :
 
 ```bash
-# Configuration de Bitcoin (Core ou Knots)
+# Configuration de Bitcoin
 # ~/.bitcoin/bitcoin.conf
 #
 # Pour plus d'informations visitez
@@ -705,9 +705,10 @@ listen=1
 #disablewallet=1
 
 # Ouverture automatique du port 8333 sur votre box : perso, je n'aime pas.
-# Depuis Core v30 natpmp=1 est le defaut : sans proxy Tor,
+# Depuis Core v30 et Knots 29.x natpmp=1 est le defaut : sans proxy Tor,
 # par exemple pendant un IBD en clearnet, la box ouvrirait le port 8333 et
-# exposerait votre IP. Ne pas commenter est plus sur.
+# exposerait votre IP. Desactiver est plus sur.
+# Pour versions avant ou egales a 28.x, l'equivalent est upnp=0
 natpmp=0
 
 
@@ -1035,6 +1036,11 @@ ProtectHome=read-only
 # le lien ~/.bitcoin et ses cibles possibles (ext4 ou BTRFS), adaptez si besoin
 ReadWritePaths=-/home/btc-node/.bitcoin -/mnt/nvme/bitcoin -/mnt/btrfs/bitcoin
 
+# Invisibles pour bitcoind (ni lecture ni ecriture) : les donnees sensibles
+# comme cles ssh/gpg, rajouter si autres repertoires.
+# Le "-" ignore un chemin absent.
+InaccessiblePaths=-/home/btc-node/.ssh -/home/btc-node/.gnupg
+
 # Aucune elevation de droits (sudo, setuid)
 NoNewPrivileges=true
 
@@ -1051,13 +1057,13 @@ SystemCallArchitectures=native
 WantedBy=multi-user.target
 ```
 
-Pourquoi ce durcissement ? L'utilisateur `btc-node` qui lance `bitcoind` est aussi le compte d'administration avec `sudo`. Sans protection, une faille exploitée dans `bitcoind` permettrait d'écrire dans le home de cet utilisateur, par exemple d'ajouter une clé dans `~/.ssh/authorized_keys` ou une commande dans `~/.bashrc`, puis de récupérer les droits `sudo` à votre prochaine connexion. `ProtectSystem=strict`, `ProtectHome=read-only` et `ReadWritePaths` limitent l'écriture au seul répertoire de données, et `NoNewPrivileges=true` empêche tout `sudo` depuis le service. La solution consacrée reste un utilisateur système dédié sans `sudo` par service, mais on perd la simplicité d'un seul utilisateur !
+Pourquoi ce durcissement ? L'utilisateur `btc-node` qui lance `bitcoind` est aussi le compte d'administration avec `sudo`. Sans protection, une faille exploitée dans `bitcoind` permettrait d'écrire dans le home de cet utilisateur, par exemple d'ajouter une clé dans `~/.ssh/authorized_keys` ou une commande dans `~/.bashrc`, puis de récupérer les droits `sudo` à votre prochaine connexion. `ProtectSystem=strict`, `ProtectHome=read-only` et `ReadWritePaths` limitent l'écriture au seul répertoire de données, `InaccessiblePaths` masque totalement les clés `~/.ssh` / `~/.gnupg`, et `NoNewPrivileges=true` empêche tout `sudo` depuis le service. La solution consacrée reste un utilisateur système dédié sans `sudo` par service, mais on perd la simplicité d'un seul utilisateur !
 
 Recharger la configuration de `systemd` après chaque création ou modification du fichier : `sudo systemctl daemon-reload`
 
 Vérifier la syntaxe par : `sudo systemd-analyze verify /etc/systemd/system/bitcoin.service` vide:ok
 
-Voir le niveau d'exposition du service : `systemd-analyze security bitcoin.service`
+Visualisez le niveau d'exposition du service : `systemd-analyze security bitcoin.service` évitez UNSAFE 😨, EXPOSED 🙁 est mieux !
 
 Afin de vérifier le déroulement, ouvrir un nouveau terminal puis observer les logs par :
 
@@ -1280,8 +1286,8 @@ cookie_file = "/home/btc-node/.bitcoin/.cookie"
 daemon_rpc_addr = "127.0.0.1:8332"
 
 # Electrs v0.12+ lit les blocs par l'API REST de bitcoind, sur le port RPC ci-dessus.
-# L'option daemon_p2p_addr n'existe plus en v0.12, a supprimer.
-# Pour Electrs v0.11.x et avant seulement :
+# L'option daemon_p2p_addr n'existe plus en v0.12, commenter cette ligne.
+# Pour Electrs v0.11.x et avant : adresse P2P d'ecoute de bitcoind sur le port 8333,
 # daemon_p2p_addr = "127.0.0.1:8333"
 
 # Repertoire dans lequel l'index Electrum doit etre stocke
@@ -1375,7 +1381,8 @@ TimeoutSec=300
 # Priorite CPU legerement inferieure a celle de bitcoind
 Nice=5
 
-# Journalisation dans le journal systemd (remplace l'obsolete "syslog")
+# Journalisation dans le journal systemd
+# Depuis Debian 12 cela remplace l'obsolete "syslog"
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=electrs
@@ -1383,18 +1390,30 @@ SyslogIdentifier=electrs
 # Durcissement : limite les degats si electrs etait compromis
 # /tmp prive, invisible des autres processus
 PrivateTmp=true
+
 # Tout le systeme de fichiers en lecture seule, sauf ReadWritePaths
 ProtectSystem=strict
+
 # /home en lecture seule (btc-node est aussi l'administrateur)
 ProtectHome=read-only
+
 # Seul l'index electrs reste modifiable, adaptez si besoin
 ReadWritePaths=-/home/btc-node/.electrs -/mnt/nvme/electrs -/mnt/btrfs/electrs
+
+# Invisibles pour electrs (ni lecture ni ecriture) : les donnees sensibles
+# comme cles ssh/gpg, rajouter si autres repertoires.
+# Le "-" ignore un chemin absent.
+InaccessiblePaths=-/home/btc-node/.ssh -/home/btc-node/.gnupg
+
 # Aucune elevation de droits (sudo, setuid)
 NoNewPrivileges=true
+
 # Pas d'acces aux peripheriques (disques, USB)
 PrivateDevices=true
+
 # Pas de memoire a la fois ecrivable et executable
 MemoryDenyWriteExecute=true
+
 # Appels systeme de l'architecture native uniquement
 SystemCallArchitectures=native
 
@@ -1416,6 +1435,8 @@ Démarrer le service `sudo systemctl start electrs.service`
 
 Vérifier que le service fonctionne correctement `sudo systemctl status electrs.service`
 
+Visualisez le niveau d'exposition du service : `systemd-analyze security electrs.service` évitez UNSAFE 😨, EXPOSED 🙁 est mieux !
+
 Observer les logs dans le terminal, c'est synchronisé avec le dernier bloc, tout est ok ? Oui, alors lancez `sudo reboot` vous devez voir `Stopped electrs.service - Electrs` dans les logs juste avant que la machine s'arrête, cela signifie que `electrs` a stoppé proprement. Au redémarrage de la machine, `bitcoind` doit se lancer automatiquement suivi par `electrs`. Pour l'arrêter, par exemple pour une mise à jour de `electrs.toml` faire : `sudo systemctl stop electrs.service`
 
 Si plus tard vous effectuez de l'exploration didactique avec le wallet Electrum sur des portefeuilles en lecture seule avec des adresses de mineurs, il est possible que le serveur `electrs` ne réponde plus pendant un certain temps. Si cela se produit, fermez le portefeuille qui a engendré le time-out, observez les logs d'`electrs`, puis choisissez une des 2 options :
@@ -1428,7 +1449,7 @@ Si plus tard vous effectuez de l'exploration didactique avec le wallet Electrum 
 
 Afin d'établir une connexion chiffrée entre le portefeuille qui sera présent sur votre ordinateur personnel et votre nœud, il faut installer et configurer Nginx.
 
-Prérequis : créer un certificat autosigné. À chaque champ attendu appuyez sur la touche `Enter`, sauf à `Common Name`, mettez `Nakamoto` ou autre chose sans laisser le champ vide.
+Prérequis : créer un certificat auto-signé. À chaque champ attendu appuyez sur la touche `Enter`, sauf à `Common Name`, mettez `Nakamoto` ou autre chose sans laisser le champ vide.
 
 ```bash
 openssl req -x509 -nodes -days 10227 -newkey rsa:2048 -keyout ~/.electrs/electrs.local.key -out ~/.electrs/electrs.local.crt
@@ -1755,7 +1776,7 @@ Le portefeuille Electrum dispose également d'une console Python intégrée, cel
 Ce qu'ils sont censés apporter :
 
 * une sécurité accrue avec génération et stockage de la master seed dans une puce spécialisée
-* la master seed ne quitte jamais le dispositif même lors de la signature d'une transaction
+* la master seed **ne quitte jamais le dispositif** même lors de la signature d'une transaction
 * ils affichent les détails de la transaction sur leur écran afin que vous puissiez la vérifier
 * la transaction est physiquement approuvée ou rejetée sur le dispositif lui-même
 * ils procurent une couche de sécurité complémentaire aux portefeuilles logiciels
@@ -1766,9 +1787,9 @@ Cette séparation des rôles est fondamentale pour la sécurité : même si votr
 
 
 1. L'achat s'effectue directement chez le fabricant, jamais de tiers entre vous et le concepteur.
-2. À réception, toujours inspecter l'emballage qui doit être scellé à un ou plusieurs niveaux.
-3. Avec l'outil officiel du fabricant, vérifiez l'authenticité du dispositif qui doit être vierge. Si besoin mettez à jour ou installez vous-même le firmware original du wallet, Bitcoin only c'est mieux. Notez la date, les références exactes du matériel, la version du firmware.
-4. Seulement deux supports doivent reporter les mots de votre seed phrase : l'écran de votre portefeuille matériel qui listera les mots une seule et unique fois (⁵) lors de la création du wallet et le support physique où seront inscrits les mots de votre main. Si vous restaurez une seed, les mots clés devront être saisis uniquement sur le portefeuille matériel.
+2. À réception, toujours inspecter l'emballage qui doit être scellé à plusieurs niveaux.
+3. Avec l'outil officiel du fabricant, vérifiez l'authenticité du dispositif qui doit être vierge. Si besoin mettez à jour ou installez vous-même le firmware original du wallet, Bitcoin only c'est mieux. Notez la date, les références exactes du matériel, la version du firmware lors de la génération de la graine.
+4. Seulement deux supports doivent reporter les mots de votre seed phrase de sauvegarde (¹⁰): l'écran de votre portefeuille matériel qui listera les mots une seule et unique fois (⁵) lors de la création du wallet et le support physique où seront inscrits les mots de votre main. Si vous restaurez une seed, les mots clés devront être saisis uniquement sur le portefeuille matériel.
 5. Après avoir créé votre portefeuille et avant de l'utiliser toujours tester votre sauvegarde en réinitialisant le device et en ressaisissant les mots sur le portefeuille matériel lui-même. La première adresse publique du portefeuille doit être intégralement identique.
 6. Si votre cold wallet est fonctionnel mais que la seed phrase est perdue (⁵) ou compromise, créez un nouveau portefeuille avec une nouvelle seed phrase puis transférez les fonds de l'ancien vers le nouveau portefeuille.
 
@@ -1779,11 +1800,11 @@ Cette séparation des rôles est fondamentale pour la sécurité : même si votr
 | **Format** | Clé usb | Clé usb | Clé usb | Carte de crédit ou anneau |
 | **Matériel et fabricant du secure element (¹)** | Open source sauf le secure element EAL6+ `Infineon Technologies` | Partiellement open source, et non open source pour le secure element EAL5+ `STMicroelectronics` ou EAL6+ avec `Infineon Technologies` suivant l'année de fabrication. | Qualifiable d'open source car le secure element `Microchip Technology` ne stocke pas les clés privées. | Propriétaire, Secure element EAL6+ `Samsung`.       Le dispositif n'est pas prévu pour être mis à jour. |
 | **Livré avec firmware ?** | Non, bootloader mode. | Oui, firmware seulement. | En principe oui. | Oui. |
-| **Application pour vérifier l'authenticité, puis installer ou mettre à jour le firmware sur le dispositif - OS supportés.** | [Trezor Suite](https://trezor.io) logiciel open source, supporte Tor - Windows / macOS / Linux / Android / iOS (portefeuille en lecture seule). | Utilisation **obligatoire** de [Ledger Live rebaptisé Ledger Wallet](https://www.ledger.com) (²) logiciel open source, ne supporte pas Tor - Windows / macOS / Linux (³) / Android / iOS non compatible. | [BitBoxApp](https://bitbox.swiss/) logiciel open source, supporte Tor - Windows / macOS / Linux(⁴) / Android | Utilisation **obligatoire** de [Tangem Crypto Wallet](https://tangem.com/) (ios / android) application mobile pour interaction avec la carte ou le ring par NFC. |
+| **Application pour vérifier l'authenticité, puis installer ou mettre à jour le firmware sur le dispositif - OS supportés.** | [Trezor Suite](https://trezor.io) logiciel open source, supporte Tor - Windows / macOS / Linux / Android / iOS (portefeuille en lecture seule). | Utilisation **obligatoire** de [Ledger Live rebaptisé Ledger Wallet](https://www.ledger.com) (²) logiciel open source, ne supporte pas Tor - Windows / macOS / Linux (³) / Android / iOS non compatible. | [BitBoxApp](https://bitbox.swiss/) logiciel open source, supporte Tor - Windows / macOS / Linux(⁴) / Android | Utilisation **obligatoire** de [Tangem Crypto Wallet](https://tangem.com/) (ios / android) application mobile pour interaction avec la carte ou le ring par NFC. (¹⁰) |
 | **Idem ci-dessus mais en ligne de commande** | Oui via `trezorctl` | Non | Oui via script Python du dépôt firmware. | Non |
 | **Support d'un nœud personnel par la suite logicielle du fabricant** | Oui avec le format Electrum SPV en clair, SSL ou TOR. Supporte également un serveur Blockbook personnel. | Non | Oui avec le format Electrum SPV en clair, SSL ou TOR. | Non |
 | **Création du wallet et initialisation du PIN sans utiliser l'App du fabricant** | Oui, l'intégration avec Electrum est forte sauf le wipe code (utilisez trezorctl). Autres : Sparrow, Specter, Bitcoin Core, etc. | Oui, tout est effectué sur le dispositif lui-même si l'app Bitcoin est installée dans le dispositif. Idem Trezor pour la liste. | Bien qu'il existe une alternative pour développeur, BitBoxApp est quasi obligatoire. | Tangem Crypto wallet |
-| **Single Seed BIP39 : Création / Restauration** | Avec Electrum 12, 18 ou 24 mots. Avec Trezor Suite et "anciennes sauvegardes" en 12 ou 24 mots / capacité à restaurer en 18 mots. | Création en 24 mots uniquement / capacité à restaurer un portefeuille avec une phrase de récupération de 12, 18 ou 24 mots. | Avec BitBoxApp création en 12 ou 24 mots / capacité à restaurer un portefeuille avec une phrase de récupération de 12, 18 ou 24 mots. | Le fabricant privilégie un backup dans plusieurs exemplaires du dispositif sans phrase de récupération, il propose néanmoins 12 ou 24 mots. |
+| **Single Seed BIP39 : Création / Restauration** | Avec Electrum 12, 18 ou 24 mots. Avec Trezor Suite et "anciennes sauvegardes" en 12 ou 24 mots / capacité à restaurer en 18 mots. | Création en 24 mots uniquement / capacité à restaurer un portefeuille avec une phrase de récupération de 12, 18 ou 24 mots. | Avec BitBoxApp création en 12 ou 24 mots / capacité à restaurer un portefeuille avec une phrase de récupération de 12, 18 ou 24 mots. | Le fabricant privilégie un backup dans plusieurs exemplaires du dispositif sans phrase de récupération (¹⁰), il propose néanmoins 12 ou 24 mots. |
 | **Vérifier sur le dispositif la phrase de récupération** | Oui | Oui en installant au préalable sur le device l'app Recovery Check à partir de l'App Ledger | Oui | Non testé |
 | **Re-visualiser la phrase de récupération sur le dispositif** | Non | Non | Oui (⁵) | Non testé |
 | **Option portefeuille caché et protégé par une passphrase** | Oui | Oui | Oui | Non |
@@ -1793,16 +1814,16 @@ Cette séparation des rôles est fondamentale pour la sécurité : même si votr
 | **Wallets tiers supportés** | Electrum, Sparrow, Specter … | Electrum, Sparrow, Specter … | Electrum, Sparrow, Specter … | Aucun |
 | **Wallets mobiles supportés - système** | Trezor Suite -Android ou version Web de Trezor Suite par WebUSB - Mycelium sur iOS / Android | Ledger Wallet - Android mais pas iOS car Bluetooth requis. | BitBoxApp avec les mêmes fonctionnalités que la version desktop (Android) | Tangem Crypto Wallet (iOS / Android) |
 | **Autres fonctionnalités** | Personnalisation écran d'accueil avec image n/b 128x64 pixels | Possibilité de créer un deuxième code PIN lié au portefeuille caché et protégé par une passphrase | Sauvegarde de la seed phrase et des notes de transactions sur microSD (fournie). | Non testé |
-| **Réinitialisation aux paramètres d'usine (effacement de toutes les données utilisateur)** | par Trezor Suite ou sur le dispositif après saisie de 16 PIN erronés ou par saisie d'un PIN dédié (wipe code) à la place du PIN de déverrouillage. | Réinitialisation aux paramètres d'usine (⁸) par le Control Center de l'App Ledger, sur le dispositif par appui long des 2 boutons (settings) ou après la saisie de 3 PIN erronés. | Réinitialisation aux paramètres d'usine avec BitBoxApp ou après la saisie sur le dispositif de 10 PIN erronés | Uniquement avec Tangem Crypto Wallet |
+| **Réinitialisation aux paramètres d'usine (effacement de toutes les données utilisateur)** | par Trezor Suite ou sur le dispositif après saisie de 16 PIN erronés ou par saisie d'un PIN dédié (wipe code) à la place du PIN de déverrouillage. | Réinitialisation aux paramètres d'usine (⁸) par le Control Center de l'App Ledger, sur le dispositif par appui long des 2 boutons (settings) ou après la saisie de 3 PIN erronés. | Réinitialisation aux paramètres d'usine avec BitBoxApp ou après la saisie sur le dispositif de 10 PIN erronés. | Uniquement avec Tangem Crypto Wallet. **⚠️** Si réinitialisation pertes des fonds si pas de sauvegarde **⚠️**. |
 | **Multi-portefeuille** | Oui (⁹) | Oui (⁹) | Oui (⁹) | Oui (⁹) |
 | **Entreprise - Pays d'origine** | [SatoshiLabs](https://trezor.io) - République tchèque | [Ledger SAS](https://www.ledger.com) - France | **[Shift Crypto](https://bitbox.swiss/) -** Suisse | [Tangem AG](https://tangem.com) -Suisse |
 | **Achat du dispositif** | Fiat ou Bitcoin | Fiat | Fiat ou Bitcoin | Fiat ou Bitcoin |
 
-(¹) à l'heure actuelle il n'existe pas de "secure element" open source, en principe c'est dans cette puce sécurisée que les clés privées sont stockées.
+(¹) à l'heure actuelle il n'existe pas de "secure element" open source, en principe c'est dans cette puce sécurisée que la master seed est stockée.
 
 (²) Ledger a la particularité de gérer chaque asset avec une app différente qu'il faut implicitement installer dans le wallet. Ce n'est pas le cas des autres fabricants qui intègrent la gestion de l'asset dans le firmware.
 
-(³) Après avoir déverrouillé le dispositif et lancé l'app Bitcoin, sous Linux il sera parfois nécessaire de fixer les règles UDEV par : `wget -q -O - https://raw.githubusercontent.com/LedgerHQ/udev-rules/master/add_udev_rules.sh | sudo bash` (comme indiqué sur le portail Ledger)
+(³) Après avoir déverrouillé le dispositif et lancé l'app Bitcoin, sous Linux il sera parfois nécessaire de fixer les règles UDEV par : `wget -q -O - https://raw.githubusercontent.com/LedgerHQ/udev-rules/master/add_udev_rules.sh | sudo bash` (comme indiqué sur le portail Ledger, vérifiez)
 
 (⁴) **Bien que non explicite sur le site du fabricant**, sous Linux il sera parfois nécessaire de fixer les règles UDEV avec un script téléchargeable [ici](https://github.com/BitBoxSwiss/bitbox-wallet-app/blob/master/frontends/qt/resources/deb-afterinstall.sh), si vous utilisez seulement BitBox02 commentez les deux lignes sous `# BitBox V1 udev rules` rendez-le exécutable par `chmod u+x deb-afterinstall.sh` puis lancez-le par `sudo ./deb-afterinstall.sh`. Heureusement que certains se sont donné la peine avec [ceci](https://github.com/spesmilo/electrum/tree/master/contrib/udev) où sont répertoriées les règles UDEV pour la majorité des hardwares wallets. Pour lister toutes les règles que vous avez mises en place : `sudo ls /etc/udev/rules.d/`
 
@@ -1822,9 +1843,11 @@ Cette séparation des rôles est fondamentale pour la sécurité : même si votr
 
 (⁹) En utilisant des chemins de dérivation ou des `Pay To` différents, il est possible de créer de multiples portefeuilles avec la même graine maîtresse (master seed), donc la même liste de mots. Attention il est préférable de noter les choix effectués puisque cela complexifie la gestion et la récupération en cas de problèmes.
 
-*Sauf pour Tangem, il est possible de restreindre l'usage des suites logicielles fournies par les fabricants, à la mise à jour ou à l'installation du firmware, à la vérification, et à l'installation du micrologiciel Bitcoin pour Ledger. Selon les fabricants ces suites sont parfois de véritables "BloatWares" !*
+(¹⁰) Tangem est un cas à part avec des choix assumés : le matériel est garanti 25 ans *sans mise à jour possible*, le modèle de sécurité initial est sans seed phrase. La master seed est générée et stockée dans la puce spécialisée et la sauvegarde est assurée par réplication dans plusieurs devices. Par la suite et sous la pression des utilisateurs, Tangem a introduit une fonctionnalité facultative de sauvegarde par seed phrase généré dans l'application du smartphone, ce qui quelque part va à l'encontre de sa philosophie de initiale.
 
-*Avec Trezor Safe 3 ou Ledger Nano S Plus vous n'avez pas besoin de créer de compte (génération de la seed phrase) dans la suite logicielle. Cette étape n'est pas aisée à contourner pour BitBox02, mais notez qu'une fois que c'est effectué soit par création ou restauration il est ensuite possible d'utiliser ce dispositif avec le portefeuille logiciel de votre choix pourvu qu'il soit compatible.*
+*Donc mis à part Tangem, il est possible de restreindre l'usage des suites logicielles fournies par les fabricants, à la mise à jour ou à l'installation du firmware, à la vérification, et à l'installation du micrologiciel Bitcoin pour Ledger. Selon les fabricants ces suites sont parfois de véritables "BloatWares" !*
+
+*Avec Trezor Safe 3 ou Ledger Nano S Plus vous n'avez pas besoin de créer de compte (génération de la seed phrase) dans la suite logicielle. Cette étape n'est pas aisée à contourner pour BitBox02, mais notez qu'une fois que c'est effectué, soit par création ou restauration, il est ensuite possible d'utiliser ce dispositif avec le portefeuille logiciel de votre choix pourvu qu'il soit compatible.*
 
 Le Trezor Safe 3 est le seul qui, assez facilement, peut entièrement se passer de la suite logicielle du fabricant. C'est avec `trezorctl`, ci-dessous une méthode d'installation sous Linux.
 
@@ -1878,7 +1901,7 @@ trezorctl get-features                     # modèle, version du firmware, état
 
 trezorctl firmware update --bitcoin-only   # variante Bitcoin-only, sinon update tout court
 
-# Le wipe code, le wallet Electrum n'a pas la fonctionnalité, initialisez-le avec trezorctl
+# Le wipe code, Electrum n'a pas la fonctionnalité, initialisez-le avec trezorctl
 trezorctl set wipe-code                    # définir le wipe code
 
 trezorctl --help                           # Pour + d'infos
@@ -1898,14 +1921,14 @@ La blockchain augmente immuablement de 144 blocs par jour et de 52596 en moyenne
 * 'v28.0' Core, pour la dernière "final" qui intègre des améliorations et des correctifs.
 * 'v27.1' Core, l'avant-dernière "final", contient des correctifs pour l'essentiel.
 
-J'avais choisi le code de Bitcoin Core V28.0 puis compilé avec Autotools, le make a duré 20mn sur mon Dell Optiplex 5050. Sur mon Raspberry Pi 5 / NVMe.M2 cela a pris 1 à 2 heures. Pour information à partir de la V29 la construction à partir du code source passe par CMake.
+J'avais choisi le code de Bitcoin Core V28.0 puis compilé avec Autotools, le make a duré 20mn sur mon Dell Optiplex 5050. Sur mon Raspberry Pi 5 / NVMe.M2 cela a pris 1 à 2 heures. Pour information à partir de la V29 la construction du binaire passe par CMake.
 
 - [ ] **Décembre 2025** : l'année 2025 a vu apparaître une crise du spam avec OP_RETURN. OP_RETURN est un opcode ou une instruction dans le langage de script de Bitcoin qui permet d'intégrer des données arbitraires dans une sortie de transaction que l'on ne peut pas dépenser. Cela signifie que ces données sont stockées sur la blockchain sans créer une sortie valide qui pourrait être réclamée plus tard. Historiquement OP_RETURN existe depuis 2009, Bitcoin v0.9 de 2014 l'a seulement rendu standard avec une limite de 40 octets, passée à 80 octets en 2015, cela permet l'ajout de petites quantités de données dans les transactions. Ces données non directement monétaires ont des cas réels d'usage : des preuves de timestamp, des hachages pour des applications comme le notaire virtuel, des métadonnées comme la payload de la Tx0 Whirlpool, etc. Avant la sortie de Bitcoin Core 30.0 d'octobre 2025 un seul OP_RETURN était autorisé par transaction avec une limite standard de relais (relay policy) de 80 octets pour empêcher une surcharge de la blockchain avec des données inutiles et qualifiables de spam. Depuis la V30 de Core cette limite historique a été levée en autorisant de multiples OP_RETURN par transaction et en les limitant à 100 000 octets au lieu de 80 (voir OP_RETURN dans le glossaire pour plus de détail) ; pour résumer, à partir de la v30 de Core la limitation des données non financières dans un bloc est tenue par celle de la taille des blocs à 4 000 000 WU (BIP141 / SegWit adopté en 2017). Les débats autour d'OP_RETURN portent souvent sur l'équilibre entre nouvelles fonctionnalités et la protection contre le spam, qui pourrait gonfler la blockchain, augmenter les coûts pour les utilisateurs ordinaires, et ainsi diminuer la décentralisation. À l'opposé de cette permissivité amenée par Bitcoin Core v30 qui semble laisser la porte grande ouverte aux usages non monétaires les plus divers, ce qui au final éloigne Bitcoin de sa mission initiale consistant à transférer sans aucune censure de la valeur en pair à pair, il y a [Bitcoin Knots](https://github.com/bitcoinknots/bitcoin) un fork de Bitcoin Core orienté décentralisation et filtrage des transactions considérées comme abusives. Par défaut, un nœud Knots ne relaie par transaction qu'un seul OP_RETURN limité par défaut à 80 octets. Sur [The Bitcoin Portal](https://thebitcoinportal.com/onchain/spam-analysis/overview) figure un dashboard qui distingue les transactions financières des non financières dans le temps. Pour plus d'information sur comment est arrivée la crise du Spam voir [ici](https://www.citadel21.com/the-merge).
 
 Début 2026 j'avais choisi le code de v29.3.knots20260507 puis en juin 2026 j'ai choisi v29.3.knots20260508 avec BIP110 activé.
 
 - [ ] 8 août 2026 : les nœuds Knots qui avaient activé BIP110 ont échoué ! Un fork de chaîne s'est produit après le bloc 961 631. Ce soft fork temporaire (RDTS pour Reduced Data Temporary Softfork) initié autour de Bitcoin Knots, de Luke Dashjr et de Dathon Ohm (pseudonyme de l'auteur de BIP110), prévu pour limiter pendant environ un an les données non financières stockées dans les blocs en réponse à Bitcoin Core v30 est devenu un hard fork. Après le bloc 961 631 la chaîne BIP110 est restée quasiment figée puisqu'elle a hérité de la difficulté de minage de la chaîne principale. Du 8/8/26 au 28/8/26, seuls 8 blocs seront produits sous SHA-256d en 20 jours ! À partir du 15 août Luke Dashjr a décidé qu'il fallait changer l'algorithme de preuve de travail de SHA-256d à Blake2b pour contourner les ASIC utilisés par la chaîne principale. Le 30/08/26 le n°961640 est le 1er bloc produit avec Blake2b. **Ce n'est plus BTC c'est** [BTCB2](https://mempool.kilombino.com/). **⚠️** *Les deux chaînes ont le même historique jusqu'au bloc 961 631. N'importez jamais vos clés privées ni votre seed dans un outil lié au fork. Si vous voulez manipuler des "jetons BIP110", séparez d'abord vos fonds, sinon une de vos transactions pourrait être rejouée sur la chaîne principale et vous faire perdre de vrais BTC* **⚠️**
-  * `v29.3.knots20260507` dernière version de Knots qui suit la chaîne principale (SHA-256d, sans BIP110/RDTS). Elle refuse même de démarrer si `consensusrules=rdts` est présent dans `bitcoin.conf`. Cette branche ne sera plus maintenue.
+  * `v29.3.knots20260507` dernière version de Knots qui suit la chaîne principale (SHA-256d, sans BIP110/RDTS). Elle refuse même de démarrer si `consensusrules=rdts` est présent dans `bitcoin.conf`. *Cette branche ne sera à priori plus maintenue.*
   * `v29.3.knots20260508` et `v29.4.knots20260508` (7 août 2026) : appliquent les règles BIP110 (RDTS). Les binaires officiels les appliquent même sans `consensusrules=rdts`, avec un simple avertissement dans les logs.
   * `v29.4.1.knots20260508` (2 septembre 2026) : hard fork vers la preuve de travail Blake2b.
   * `v29.4.2.knots20260508` (21 septembre 2026, marquée "Latest") : poursuit sur la chaîne Blake2b.
@@ -1923,7 +1946,7 @@ Je n'ai pas choisi, j'ai installé ces 2 versions sur 2 machines différentes.
 
 ## Code is law
 
-Dans l'univers Bitcoin, « Code is law » veut dire que les règles du réseau ne dépendent ni d'une banque centrale, ni d'un gouvernement, ni d'une entreprise : elles sont inscrites dans le protocole. Chaque nœud les applique lui-même. Le plafond de 21 millions de bitcoins, la double dépense impossible, la validation des transactions ou la difficulté du minage ne se négocient pas, ils s'exécutent. Une transaction valide selon le code passe, une transaction invalide est rejetée, quel que soit son auteur. Ce principe rend possible un système sans intermédiaire de confiance, où la confiance porte sur des règles mathématiques transparentes et vérifiables par tous. La formule a pourtant ses limites. En 2010, une faille a permis de créer d'un coup plus de 184 milliards de bitcoins, et la communauté a corrigé le code puis abandonné la branche fautive. Au fond, le code fait loi parce qu'une majorité d'utilisateurs choisit de faire tourner ce code-là : la gouvernance reste humaine.
+Dans l'univers Bitcoin, « Code is law » veut dire que les règles du réseau ne dépendent ni d'une banque centrale, ni d'un gouvernement, et en théorie ni d'une entreprise ou d'un lobby quelconque : elles sont inscrites dans le protocole. Chaque nœud les applique lui-même. Le plafond de 21 millions de bitcoins, la double dépense impossible, la validation des transactions ou la difficulté du minage ne se négocient pas, ils s'exécutent. Une transaction valide selon le code passe, une transaction invalide est rejetée, quel que soit son auteur. Ce principe rend possible un système sans intermédiaire de confiance, où la confiance porte sur des règles mathématiques transparentes et vérifiables par tous. La formule a pourtant ses limites. En 2010, une faille a permis de créer d'un coup plus de 184 milliards de bitcoins, et la communauté a corrigé le code puis abandonné la branche fautive. Au fond, le code fait loi parce qu'une majorité d'utilisateurs choisit de faire tourner ce code-là : la gouvernance reste humaine.
 
 ## Copie directe de la blockchain
 
@@ -2103,7 +2126,7 @@ sudo systemctl stop electrs.service   # Stoppez electrs (si installe)
 sudo systemctl stop bitcoin.service   # Stoppez le demon bitcoind
 # Attendre le retour de l'invite : bitcoind ecrit (parfois plusieurs Go)
 # le cache UTXO de la RAM vers le disque
-DATE=$(date +%F_%H%M)                 # ex. 2026-10-13_2130
+DATE=$(date +%F_%Hh%Mmin)                 # ex. 2026-10-13_21h30min
 sudo btrfs subvolume snapshot -r /mnt/btrfs/bitcoin /mnt/btrfs/snapshots/bitcoin_${DATE}_RO
 sudo btrfs subvolume snapshot -r /mnt/btrfs/electrs /mnt/btrfs/snapshots/electrs_${DATE}_RO
 sudo systemctl start bitcoin.service  # Demarrer le demon bitcoind
@@ -2259,7 +2282,7 @@ git tag
 
 **Ici pour l'exemple, je choisis la "Core v29.0"**
 
-Indispensable : vérifier que la "release" que vous avez sélectionnée est signée, avant de compiler :
+Indispensable : vérifier que la "release" que vous avez sélectionnée est signée, avant de la construire :
 
 ```bash
 # Cles des mainteneurs : depot guix.sigs, distinct du depot du code (voir compilation initiale)
@@ -2276,9 +2299,9 @@ Poursuivre avec
 ```bash
 git checkout tags/v29.0
 
-Pour la construction voir compilation initiale plus haut, faire le distinguo version.
-A partir de la v29 ce n'est plus Autotools mais CMake qui est utilisé
-Compiler ici ...
+# Pour la construction voir compilation initiale plus haut, faire le distinguo version.
+# A partir de la v29 ce n'est plus Autotools mais CMake qui est utilisé
+# Compiler ici ... SANS l'installer !
 ```
 
 Le nouveau binaire est construit, on continue
@@ -2296,7 +2319,7 @@ sudo systemctl stop bitcoin.service
 # sinon attendez parfois qq min
 
 # Si BTRFS : snapshot read-only maintenant, les services sont deja arretes
-DATE=$(date +%F_%H%M)
+DATE=$(date +%F_%Hh%Mmin)
 sudo btrfs subvolume snapshot -r /mnt/btrfs/bitcoin /mnt/btrfs/snapshots/bitcoin_${DATE}_RO
 sudo btrfs subvolume snapshot -r /mnt/btrfs/electrs /mnt/btrfs/snapshots/electrs_${DATE}_RO
 
